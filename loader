@@ -1,0 +1,850 @@
+warn = function() end
+
+local Loader = Instance.new("ScreenGui")
+local UIScale = Instance.new("UIScale")
+local Main = Instance.new("Frame")
+local Shadow = Instance.new("Frame")
+local Container = Instance.new("Frame")
+local Container_2 = Instance.new("Frame")
+local Container_3 = Instance.new("Frame")
+local Container_4 = Instance.new("Frame")
+local Case = Instance.new("Folder")
+local Hub = Instance.new("Frame")
+local Top = Instance.new("Frame")
+local Frame = Instance.new("Frame")
+local Frame_2 = Instance.new("Frame")
+local Frame_3 = Instance.new("Frame")
+local Frame_4 = Instance.new("Frame")
+local Frame_5 = Instance.new("Frame")
+local Projects = Instance.new("Frame")
+local ScrollingFrame = Instance.new("ScrollingFrame")
+local UIListLayout = Instance.new("UIListLayout")
+local load = Instance.new("Frame")
+local TextButton = Instance.new("TextButton")
+local TextLabel = Instance.new("TextLabel")
+local UIPadding = Instance.new("UIPadding")
+local ImageLabel = Instance.new("ImageLabel")
+local TextLabel_2 = Instance.new("TextLabel")
+local UIPadding_2 = Instance.new("UIPadding")
+local UIListLayout_2 = Instance.new("UIListLayout")
+local Options = Instance.new("Frame")
+local Frame_6 = Instance.new("Frame")
+local Frame_7 = Instance.new("Frame")
+local Frame_8 = Instance.new("Frame")
+local Frame_9 = Instance.new("Frame")
+local ScrollingFrame_2 = Instance.new("ScrollingFrame")
+local UIListLayout_3 = Instance.new("UIListLayout")
+local UIPadding_3 = Instance.new("UIPadding")
+local load_2 = Instance.new("Frame")
+local TextButton_2 = Instance.new("TextButton")
+local Frame_10 = Instance.new("Frame")
+local Frame_11 = Instance.new("Frame")
+local TextLabel_3 = Instance.new("TextLabel")
+local TextLabel_4 = Instance.new("TextLabel")
+local ImageLabel_2 = Instance.new("ImageLabel")
+local exit = Instance.new("Frame")
+local TextButton_3 = Instance.new("TextButton")
+local Frame_12 = Instance.new("Frame")
+local Frame_13 = Instance.new("Frame")
+local TextLabel_5 = Instance.new("TextLabel")
+local TextLabel_6 = Instance.new("TextLabel")
+local ImageLabel_3 = Instance.new("ImageLabel")
+local Frame_14 = Instance.new("Frame")
+local TextLabel_7 = Instance.new("TextLabel")
+local UIPadding_4 = Instance.new("UIPadding")
+local Bottom = Instance.new("Frame")
+local output = Instance.new("Frame")
+local Options_2 = Instance.new("Frame")
+local Frame_15 = Instance.new("Frame")
+local Frame_16 = Instance.new("Frame")
+local Frame_17 = Instance.new("Frame")
+local Frame_18 = Instance.new("Frame")
+local ScrollingFrame_3 = Instance.new("ScrollingFrame")
+local UIListLayout_4 = Instance.new("UIListLayout")
+local UIPadding_5 = Instance.new("UIPadding")
+local Container_5 = Instance.new("Frame")
+local UIListLayout_5 = Instance.new("UIListLayout")
+local Frame_19 = Instance.new("Frame")
+local TextLabel_10 = Instance.new("TextLabel")
+local UIListLayout_6 = Instance.new("UIListLayout")
+local UIListLayout_7 = Instance.new("UIListLayout")
+local _145e8eae6ead40fea442b71a9f9af5b0 = Instance.new("ImageLabel")
+local e284d76cc1514c3392c45dd56aafc55d = Instance.new("Frame")
+local _76f96bb200604eaca9076b424f8aba60 = Instance.new("ImageLabel")
+
+-- 
+local grad_1 = Instance.new("UIGradient",Frame_11)
+grad_1.Color = ColorSequence.new(Color3.new(1, 1, 1),Color3.new(0.862745, 0.862745, 0.862745))
+grad_1.Rotation = 270
+--
+local grad_2 = Instance.new("UIGradient",Frame_13)
+grad_2.Color = ColorSequence.new(Color3.new(1, 1, 1),Color3.new(0.862745, 0.862745, 0.862745))
+grad_2.Rotation = 270
+--
+local grad_3 = Instance.new("UIGradient",load)
+grad_3.Color = ColorSequence.new(Color3.new(1, 1, 1),Color3.new(0.827451, 0.827451, 0.827451))
+grad_3.Rotation = 270
+--
+Loader.Name = "Loader"
+Loader.Parent = game.CoreGui
+Loader.DisplayOrder = 9999
+Loader.IgnoreGuiInset = true
+Loader.ResetOnSpawn = false
+
+UIScale.Parent = Loader
+--
+Main.Name = "Main"
+Main.Parent = Loader
+Main.AnchorPoint = Vector2.new(0.5, 0.5)
+Main.BackgroundColor3 = Color3.new(0.0980392, 0.0980392, 0.0980392)
+Main.BorderColor3 = Color3.new(0.0470588, 0.0470588, 0.0470588)
+Main.Position = UDim2.new(0.5, 0, 0.5, 0)
+Main.Size = UDim2.new(0, 520, 0, 398)
+
+Shadow.Name = "Shadow"
+Shadow.Parent = Main
+Shadow.BackgroundColor3 = Color3.new(0.156863, 0.156863, 0.156863)
+Shadow.BorderColor3 = Color3.new(0, 0, 0)
+Shadow.BorderSizePixel = 0
+Shadow.Position = UDim2.new(0, 1, 0, 1)
+Shadow.Size = UDim2.new(1, -2, 1, -2)
+
+Container.Name = "Container"
+Container.Parent = Main
+Container.BackgroundColor3 = Color3.new(0.0470588, 0.0470588, 0.0470588)
+Container.BorderColor3 = Color3.new(0.235294, 0.235294, 0.235294)
+Container.Position = UDim2.new(0, 3, 0, 3)
+Container.Size = UDim2.new(1, -6, 1, -6)
+
+Container_2.Name = "Container"
+Container_2.Parent = Container
+Container_2.AnchorPoint = Vector2.new(1, 0)
+Container_2.BackgroundColor3 = Color3.new(0, 0, 0)
+Container_2.BorderColor3 = Color3.new(0, 0, 0)
+Container_2.BorderSizePixel = 0
+Container_2.Position = UDim2.new(1, 0, 0, 4)
+Container_2.Size = UDim2.new(1, 0, 1, -4)
+
+Container_3.Name = "Container"
+Container_3.Parent = Container_2
+Container_3.BackgroundColor3 = Color3.new(0.176471, 0.176471, 0.176471)
+Container_3.BorderColor3 = Color3.new(0, 0, 0)
+Container_3.BorderSizePixel = 0
+Container_3.Position = UDim2.new(0, 1, 0, 0)
+Container_3.Size = UDim2.new(1, -1, 1, 0)
+
+Container_4.Name = "Container"
+Container_4.Parent = Container_3
+Container_4.BackgroundColor3 = Color3.new(0.0784314, 0.0784314, 0.0784314)
+Container_4.BorderColor3 = Color3.new(0, 0, 0)
+Container_4.BorderSizePixel = 0
+Container_4.Position = UDim2.new(0, 1, 0, 0)
+Container_4.Size = UDim2.new(1, -1, 1, 0)
+
+Case.Name = "Case"
+Case.Parent = Container_4
+
+Hub.Name = "Hub"
+Hub.Parent = Case
+Hub.AnchorPoint = Vector2.new(0.5, 0.5)
+Hub.BackgroundColor3 = Color3.new(1, 1, 1)
+Hub.BackgroundTransparency = 1
+Hub.BorderColor3 = Color3.new(0, 0, 0)
+Hub.BorderSizePixel = 0
+Hub.Position = UDim2.new(0.5, 0, 0.5, 0)
+Hub.Size = UDim2.new(1, 0, 1, 0)
+Hub.ZIndex = 5
+
+Top.Name = "Top"
+Top.Parent = Hub
+Top.LayoutOrder = 1
+Top.BackgroundColor3 = Color3.new(0, 0, 0)
+Top.BackgroundTransparency = 1
+Top.BorderColor3 = Color3.new(0, 0, 0)
+Top.BorderSizePixel = 0
+Top.Position = UDim2.new(0, 20, 0, 20)
+Top.Size = UDim2.new(0, 470, 0, 160)
+
+Frame.Parent = Top
+Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+Frame.BackgroundTransparency = 1
+Frame.BorderColor3 = Color3.new(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Size = UDim2.new(0, 226, 0, 158)
+
+Frame_2.Parent = Frame
+Frame_2.BackgroundColor3 = Color3.new(0.156863, 0.156863, 0.156863)
+Frame_2.BorderColor3 = Color3.new(0.0470588, 0.0470588, 0.0470588)
+Frame_2.Size = UDim2.new(1, 0, 0, 158)
+Frame_2.ZIndex = 2
+
+Frame_3.Parent = Frame_2
+Frame_3.BackgroundColor3 = Color3.new(0, 0, 0)
+Frame_3.BackgroundTransparency = 1
+Frame_3.BorderColor3 = Color3.new(0, 0, 0)
+Frame_3.BorderSizePixel = 0
+Frame_3.Position = UDim2.new(0, 1, 0, 1)
+Frame_3.Size = UDim2.new(1, -2, 1, -2)
+Frame_3.ZIndex = 2
+
+Frame_4.Parent = Frame_3
+Frame_4.AnchorPoint = Vector2.new(1, 0)
+Frame_4.BackgroundColor3 = Color3.new(0.176471, 0.176471, 0.176471)
+Frame_4.BorderColor3 = Color3.new(0, 0, 0)
+Frame_4.BorderSizePixel = 0
+Frame_4.Position = UDim2.new(1, 0, 0, 0)
+Frame_4.Size = UDim2.new(0, 6, 1, 0)
+Frame_4.Visible = false
+Frame_4.ZIndex = 4
+
+Frame_5.Parent = Frame_3
+Frame_5.BackgroundColor3 = Color3.new(0.176471, 0.176471, 0.176471)
+Frame_5.BorderColor3 = Color3.new(0, 0, 0)
+Frame_5.BorderSizePixel = 0
+Frame_5.Position = UDim2.new(0, 0, 0, -1)
+Frame_5.Size = UDim2.new(1, 0, 0, 1)
+Frame_5.ZIndex = 4
+
+Projects.Name = "Projects"
+Projects.Parent = Frame_2
+Projects.BackgroundColor3 = Color3.new(0.0901961, 0.0901961, 0.0901961)
+Projects.BorderColor3 = Color3.new(0, 0, 0)
+Projects.BorderSizePixel = 0
+Projects.Position = UDim2.new(0, 1, 0, 1)
+Projects.Size = UDim2.new(1, -2, 1, -2)
+Projects.ZIndex = 2
+
+ScrollingFrame.Parent = Projects
+ScrollingFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+ScrollingFrame.BackgroundTransparency = 1
+ScrollingFrame.BorderColor3 = Color3.new(0, 0, 0)
+ScrollingFrame.BorderSizePixel = 0
+ScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+ScrollingFrame.ZIndex = 4
+ScrollingFrame.BottomImage = "rbxassetid://7783554086"
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollingFrame.MidImage = "rbxassetid://7783554086"
+ScrollingFrame.ScrollBarThickness = 5
+ScrollingFrame.TopImage = "rbxassetid://7783554086"
+
+UIListLayout.Parent = ScrollingFrame
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+load.Name = "load"
+load.Parent = ScrollingFrame
+load.BackgroundColor3 = Color3.new(0.101961, 0.101961, 0.101961)
+load.BorderColor3 = Color3.new(0, 0, 0)
+load.BorderSizePixel = 0
+load.LayoutOrder = 1
+load.Size = UDim2.new(1, 0, 0, 39)
+load.ZIndex = 3
+
+TextButton.Parent = load
+TextButton.BackgroundColor3 = Color3.new(0, 0, 0)
+TextButton.BackgroundTransparency = 1
+TextButton.BorderColor3 = Color3.new(0, 0, 0)
+TextButton.BorderSizePixel = 0
+TextButton.Size = UDim2.new(1, 0, 1, 0)
+TextButton.ZIndex = 999999999
+TextButton.Text = ""
+
+TextLabel.Parent = load
+TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+TextLabel.BackgroundColor3 = Color3.new(0, 0, 0)
+TextLabel.BackgroundTransparency = 1
+TextLabel.BorderColor3 = Color3.new(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+TextLabel.Size = UDim2.new(1, 0, 1, 0)
+TextLabel.ZIndex = 9
+TextLabel.FontFace = Font.fromId(11598121416, Enum.FontWeight.SemiBold, Enum.FontStyle.Normal)
+TextLabel.Text = "updated 2025/01/01"
+TextLabel.TextColor3 = Color3.new(0.607843, 0.607843, 0.607843)
+TextLabel.TextSize = 10
+TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+UIPadding.Parent = TextLabel
+UIPadding.PaddingLeft = UDim.new(0, 50)
+UIPadding.PaddingTop = UDim.new(0, 10)
+
+ImageLabel.Parent = load
+ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+ImageLabel.BackgroundColor3 = Color3.new(1, 1, 1)
+ImageLabel.BorderColor3 = Color3.new(0, 0, 0)
+ImageLabel.BorderSizePixel = 0
+ImageLabel.Position = UDim2.new(0, 25, 0.5, 0)
+ImageLabel.Size = UDim2.new(0, 30, 0, 30)
+ImageLabel.ZIndex = 9
+ImageLabel.Image = "http://www.roblox.com/Thumbs/Asset.ashx?Width=768&Height=432&AssetID=7336302630"
+                                                                                       
+TextLabel_2.Parent = load
+TextLabel_2.AnchorPoint = Vector2.new(0.5, 0.5)
+TextLabel_2.BackgroundColor3 = Color3.new(0, 0, 0)
+TextLabel_2.BackgroundTransparency = 1
+TextLabel_2.BorderColor3 = Color3.new(0, 0, 0)
+TextLabel_2.BorderSizePixel = 0
+TextLabel_2.Position = UDim2.new(0.5, 0, 0.5, 0)
+TextLabel_2.Size = UDim2.new(1, 0, 1, 0)
+TextLabel_2.ZIndex = 9
+TextLabel_2.FontFace = Font.fromId(11598121416, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
+TextLabel_2.Text = "Project Delta"
+TextLabel_2.TextColor3 = Color3.new(0.482353, 0.760784, 0.0823529)
+TextLabel_2.TextSize = 13
+TextLabel_2.TextXAlignment = Enum.TextXAlignment.Left
+
+UIPadding_2.Parent = TextLabel_2
+UIPadding_2.PaddingBottom = UDim.new(0, 11)
+UIPadding_2.PaddingLeft = UDim.new(0, 50)
+
+UIListLayout_2.Parent = Top
+UIListLayout_2.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout_2.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout_2.Padding = UDim.new(0, 18)
+
+Options.Name = "Options"
+Options.Parent = Top
+Options.BackgroundColor3 = Color3.new(0.156863, 0.156863, 0.156863)
+Options.BorderColor3 = Color3.new(0.0470588, 0.0470588, 0.0470588)
+Options.Size = UDim2.new(0, 226, 0, 158)
+Options.ZIndex = 2
+
+Frame_6.Parent = Options
+Frame_6.BackgroundColor3 = Color3.new(0, 0, 0)
+Frame_6.BackgroundTransparency = 1
+Frame_6.BorderColor3 = Color3.new(0, 0, 0)
+Frame_6.BorderSizePixel = 0
+Frame_6.Position = UDim2.new(0, 1, 0, 1)
+Frame_6.Size = UDim2.new(1, -2, 1, -2)
+Frame_6.ZIndex = 2
+
+Frame_7.Parent = Frame_6
+Frame_7.AnchorPoint = Vector2.new(1, 0)
+Frame_7.BackgroundColor3 = Color3.new(0.176471, 0.176471, 0.176471)
+Frame_7.BorderColor3 = Color3.new(0, 0, 0)
+Frame_7.BorderSizePixel = 0
+Frame_7.Position = UDim2.new(1, 0, 0, 0)
+Frame_7.Size = UDim2.new(0, 6, 1, 0)
+Frame_7.Visible = false
+Frame_7.ZIndex = 4
+
+Frame_8.Parent = Frame_6
+Frame_8.BackgroundColor3 = Color3.new(0.176471, 0.176471, 0.176471)
+Frame_8.BorderColor3 = Color3.new(0, 0, 0)
+Frame_8.BorderSizePixel = 0
+Frame_8.Position = UDim2.new(0, 0, 0, -1)
+Frame_8.Size = UDim2.new(1, 0, 0, 1)
+Frame_8.ZIndex = 4
+
+Frame_9.Parent = Options
+Frame_9.BackgroundColor3 = Color3.new(0.0901961, 0.0901961, 0.0901961)
+Frame_9.BorderColor3 = Color3.new(0, 0, 0)
+Frame_9.BorderSizePixel = 0
+Frame_9.Position = UDim2.new(0, 1, 0, 1)
+Frame_9.Size = UDim2.new(1, -2, 1, -2)
+Frame_9.ZIndex = 2
+
+ScrollingFrame_2.Parent = Frame_9
+ScrollingFrame_2.BackgroundColor3 = Color3.new(0, 0, 0)
+ScrollingFrame_2.BackgroundTransparency = 1
+ScrollingFrame_2.BorderColor3 = Color3.new(0, 0, 0)
+ScrollingFrame_2.BorderSizePixel = 0
+ScrollingFrame_2.Size = UDim2.new(1, 0, 1, 0)
+ScrollingFrame_2.ZIndex = 4
+ScrollingFrame_2.BottomImage = "rbxassetid://7783554086"
+ScrollingFrame_2.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollingFrame_2.MidImage = "rbxassetid://7783554086"
+ScrollingFrame_2.ScrollBarThickness = 5
+ScrollingFrame_2.TopImage = "rbxassetid://7783554086"
+
+UIListLayout_3.Parent = ScrollingFrame_2
+UIListLayout_3.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout_3.SortOrder = Enum.SortOrder.LayoutOrder
+
+UIPadding_3.Parent = ScrollingFrame_2
+UIPadding_3.PaddingBottom = UDim.new(0, 15)
+UIPadding_3.PaddingTop = UDim.new(0, 15)
+
+load_2.Name = "load"
+load_2.Parent = ScrollingFrame_2
+load_2.BackgroundColor3 = Color3.new(0, 0, 0)
+load_2.BackgroundTransparency = 1
+load_2.BorderColor3 = Color3.new(0, 0, 0)
+load_2.BorderSizePixel = 0
+load_2.LayoutOrder = 1
+load_2.Size = UDim2.new(1, 0, 0, 39)
+load_2.ZIndex = 3
+
+TextButton_2.Parent = load_2
+TextButton_2.BackgroundColor3 = Color3.new(0, 0, 0)
+TextButton_2.BackgroundTransparency = 1
+TextButton_2.BorderColor3 = Color3.new(0, 0, 0)
+TextButton_2.BorderSizePixel = 0
+TextButton_2.Size = UDim2.new(1, 0, 1, 0)
+TextButton_2.ZIndex = 99
+TextButton_2.Text = ""
+
+Frame_10.Parent = load_2
+Frame_10.AnchorPoint = Vector2.new(0.5, 0)
+Frame_10.BackgroundColor3 = Color3.new(0.0470588, 0.0470588, 0.0470588)
+Frame_10.BorderColor3 = Color3.new(0, 0, 0)
+Frame_10.BorderSizePixel = 0
+Frame_10.Position = UDim2.new(0.5, 0, 0, 15)
+Frame_10.Size = UDim2.new(1, -45, 0, 30)
+Frame_10.ZIndex = 3
+
+Frame_11.Parent = Frame_10
+Frame_11.BackgroundColor3 = Color3.new(0.141176, 0.141176, 0.141176)
+Frame_11.BorderColor3 = Color3.new(0, 0, 0)
+Frame_11.BorderSizePixel = 0
+Frame_11.Position = UDim2.new(0, 1, 0, 1)
+Frame_11.Size = UDim2.new(1, -2, 1, -2)
+Frame_11.ZIndex = 3
+
+TextLabel_3.Parent = Frame_11
+TextLabel_3.AnchorPoint = Vector2.new(0.5, 0.5)
+TextLabel_3.BackgroundColor3 = Color3.new(0, 0, 0)
+TextLabel_3.BackgroundTransparency = 1
+TextLabel_3.BorderColor3 = Color3.new(0, 0, 0)
+TextLabel_3.BorderSizePixel = 0
+TextLabel_3.Position = UDim2.new(0.5, 0, 0.5, 0)
+TextLabel_3.Size = UDim2.new(1, 0, 1, 0)
+TextLabel_3.ZIndex = 3
+TextLabel_3.FontFace = Font.fromId(11598121416, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+TextLabel_3.Text = "Load"
+TextLabel_3.TextColor3 = Color3.new(0.607843, 0.607843, 0.607843)
+TextLabel_3.TextSize = 11
+
+TextLabel_4.Parent = Frame_11
+TextLabel_4.AnchorPoint = Vector2.new(0.5, 0.5)
+TextLabel_4.BackgroundColor3 = Color3.new(0, 0, 0)
+TextLabel_4.BackgroundTransparency = 1
+TextLabel_4.BorderColor3 = Color3.new(0, 0, 0)
+TextLabel_4.BorderSizePixel = 0
+TextLabel_4.Position = UDim2.new(0.5, 0, 0.5, 0)
+TextLabel_4.Size = UDim2.new(1, 0, 1, 0)
+TextLabel_4.ZIndex = 3
+TextLabel_4.FontFace = Font.fromId(11598121416, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+TextLabel_4.Text = "Load"
+TextLabel_4.TextColor3 = Color3.new(0.607843, 0.607843, 0.607843)
+TextLabel_4.TextSize = 11
+
+ImageLabel_2.Parent = Frame_11
+ImageLabel_2.BackgroundColor3 = Color3.new(0, 0, 0)
+ImageLabel_2.BackgroundTransparency = 1
+ImageLabel_2.BorderColor3 = Color3.new(0, 0, 0)
+ImageLabel_2.BorderSizePixel = 0
+ImageLabel_2.Position = UDim2.new(1, -11, 0.5, -4)
+ImageLabel_2.Size = UDim2.new(0, 7, 0, 6)
+ImageLabel_2.Visible = false
+ImageLabel_2.ZIndex = 3
+ImageLabel_2.Image = "rbxassetid://8532000591"
+
+exit.Name = "exit"
+exit.Parent = ScrollingFrame_2
+exit.BackgroundColor3 = Color3.new(0, 0, 0)
+exit.BackgroundTransparency = 1
+exit.BorderColor3 = Color3.new(0, 0, 0)
+exit.BorderSizePixel = 0
+exit.LayoutOrder = 2
+exit.Size = UDim2.new(1, 0, 0, 39)
+exit.ZIndex = 3
+
+TextButton_3.Parent = exit
+TextButton_3.BackgroundColor3 = Color3.new(0, 0, 0)
+TextButton_3.BackgroundTransparency = 1
+TextButton_3.BorderColor3 = Color3.new(0, 0, 0)
+TextButton_3.BorderSizePixel = 0
+TextButton_3.Size = UDim2.new(1, 0, 1, 0)
+TextButton_3.ZIndex = 99
+TextButton_3.Text = ""
+
+Frame_12.Parent = exit
+Frame_12.AnchorPoint = Vector2.new(0.5, 0)
+Frame_12.BackgroundColor3 = Color3.new(0.0470588, 0.0470588, 0.0470588)
+Frame_12.BorderColor3 = Color3.new(0, 0, 0)
+Frame_12.BorderSizePixel = 0
+Frame_12.Position = UDim2.new(0.5, 0, 0, 15)
+Frame_12.Size = UDim2.new(1, -45, 0, 30)
+Frame_12.ZIndex = 3
+
+Frame_13.Parent = Frame_12
+Frame_13.BackgroundColor3 = Color3.new(0.141176, 0.141176, 0.141176)
+Frame_13.BorderColor3 = Color3.new(0, 0, 0)
+Frame_13.BorderSizePixel = 0
+Frame_13.Position = UDim2.new(0, 1, 0, 1)
+Frame_13.Size = UDim2.new(1, -2, 1, -2)
+Frame_13.ZIndex = 3
+
+TextLabel_5.Parent = Frame_13
+TextLabel_5.AnchorPoint = Vector2.new(0.5, 0.5)
+TextLabel_5.BackgroundColor3 = Color3.new(0, 0, 0)
+TextLabel_5.BackgroundTransparency = 1
+TextLabel_5.BorderColor3 = Color3.new(0, 0, 0)
+TextLabel_5.BorderSizePixel = 0
+TextLabel_5.Position = UDim2.new(0.5, 0, 0.5, 0)
+TextLabel_5.Size = UDim2.new(1, 0, 1, 0)
+TextLabel_5.ZIndex = 3
+TextLabel_5.FontFace = Font.fromId(11598121416, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+TextLabel_5.Text = "Exit"
+TextLabel_5.TextColor3 = Color3.new(0.607843, 0.607843, 0.607843)
+TextLabel_5.TextSize = 11
+
+TextLabel_6.Parent = Frame_13
+TextLabel_6.AnchorPoint = Vector2.new(0.5, 0.5)
+TextLabel_6.BackgroundColor3 = Color3.new(0, 0, 0)
+TextLabel_6.BackgroundTransparency = 1
+TextLabel_6.BorderColor3 = Color3.new(0, 0, 0)
+TextLabel_6.BorderSizePixel = 0
+TextLabel_6.Position = UDim2.new(0.5, 0, 0.5, 0)
+TextLabel_6.Size = UDim2.new(1, 0, 1, 0)
+TextLabel_6.ZIndex = 3
+TextLabel_6.FontFace = Font.fromId(11598121416, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+TextLabel_6.Text = "Exit"
+TextLabel_6.TextColor3 = Color3.new(0.607843, 0.607843, 0.607843)
+TextLabel_6.TextSize = 11
+
+ImageLabel_3.Parent = Frame_13
+ImageLabel_3.BackgroundColor3 = Color3.new(0, 0, 0)
+ImageLabel_3.BackgroundTransparency = 1
+ImageLabel_3.BorderColor3 = Color3.new(0, 0, 0)
+ImageLabel_3.BorderSizePixel = 0
+ImageLabel_3.Position = UDim2.new(1, -11, 0.5, -4)
+ImageLabel_3.Size = UDim2.new(0, 7, 0, 6)
+ImageLabel_3.Visible = false
+ImageLabel_3.ZIndex = 3
+ImageLabel_3.Image = "rbxassetid://8532000591"
+
+Frame_14.Parent = Options
+Frame_14.BackgroundColor3 = Color3.new(0.0901961, 0.0901961, 0.0901961)
+Frame_14.BorderColor3 = Color3.new(0, 0, 0)
+Frame_14.BorderSizePixel = 0
+Frame_14.Position = UDim2.new(0, 9, 0, -1)
+Frame_14.Size = UDim2.new(0, 39, 0, 2)
+Frame_14.ZIndex = 5
+
+TextLabel_7.Parent = Options
+TextLabel_7.AnchorPoint = Vector2.new(0, 0.5)
+TextLabel_7.BackgroundColor3 = Color3.new(0, 0, 0)
+TextLabel_7.BackgroundTransparency = 1
+TextLabel_7.BorderColor3 = Color3.new(0, 0, 0)
+TextLabel_7.BorderSizePixel = 0
+TextLabel_7.Position = UDim2.new(0, 12, 0, 0)
+TextLabel_7.Size = UDim2.new(1, -26, 0, 15)
+TextLabel_7.ZIndex = 5
+TextLabel_7.FontFace = Font.fromId(11598121416, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+TextLabel_7.Text = "Options"
+TextLabel_7.TextColor3 = Color3.new(0.803922, 0.803922, 0.803922)
+TextLabel_7.TextSize = 11
+TextLabel_7.TextXAlignment = Enum.TextXAlignment.Left
+
+UIPadding_4.Parent = Hub
+UIPadding_4.PaddingTop = UDim.new(0, 20)
+
+Bottom.Name = "Bottom"
+Bottom.Parent = Hub
+Bottom.LayoutOrder = 3
+Bottom.BackgroundColor3 = Color3.new(0, 0, 0)
+Bottom.BackgroundTransparency = 1
+Bottom.BorderColor3 = Color3.new(0, 0, 0)
+Bottom.BorderSizePixel = 0
+Bottom.Position = UDim2.new(0, 20, 0, 20)
+Bottom.Size = UDim2.new(0, 470, 0, 160)
+
+output.Name = "output"
+output.Parent = Bottom
+output.BackgroundColor3 = Color3.new(1, 1, 1)
+output.BackgroundTransparency = 1
+output.BorderColor3 = Color3.new(0, 0, 0)
+output.BorderSizePixel = 0
+output.LayoutOrder = 3
+output.Position = UDim2.new(0, 0, 0.5, 0)
+output.Size = UDim2.new(0, 470, 0, 168)
+output.ZIndex = 999999999
+
+Options_2.Name = "Options"
+Options_2.Parent = output
+Options_2.AnchorPoint = Vector2.new(0.5, 0.5)
+Options_2.BackgroundColor3 = Color3.new(0.156863, 0.156863, 0.156863)
+Options_2.BorderColor3 = Color3.new(0.0470588, 0.0470588, 0.0470588)
+Options_2.Position = UDim2.new(0.5, 0, 0.5, 0)
+Options_2.Size = UDim2.new(1, 0, 0.987500012, 0)
+Options_2.ZIndex = 2
+
+Frame_15.Parent = Options_2
+Frame_15.BackgroundColor3 = Color3.new(0, 0, 0)
+Frame_15.BackgroundTransparency = 1
+Frame_15.BorderColor3 = Color3.new(0, 0, 0)
+Frame_15.BorderSizePixel = 0
+Frame_15.Position = UDim2.new(0, 1, 0, 1)
+Frame_15.Size = UDim2.new(1, -2, 1, -2)
+Frame_15.ZIndex = 2
+
+Frame_16.Parent = Frame_15
+Frame_16.AnchorPoint = Vector2.new(1, 0)
+Frame_16.BackgroundColor3 = Color3.new(0.176471, 0.176471, 0.176471)
+Frame_16.BorderColor3 = Color3.new(0, 0, 0)
+Frame_16.BorderSizePixel = 0
+Frame_16.Position = UDim2.new(1, 0, 0, 0)
+Frame_16.Size = UDim2.new(0, 6, 1, 0)
+Frame_16.Visible = false
+Frame_16.ZIndex = 4
+
+Frame_17.Parent = Frame_15
+Frame_17.BackgroundColor3 = Color3.new(0.176471, 0.176471, 0.176471)
+Frame_17.BorderColor3 = Color3.new(0, 0, 0)
+Frame_17.BorderSizePixel = 0
+Frame_17.Position = UDim2.new(0, 0, 0, -1)
+Frame_17.Size = UDim2.new(1, 0, 0, 1)
+Frame_17.ZIndex = 4
+
+Frame_18.Parent = Options_2
+Frame_18.BackgroundColor3 = Color3.new(0.0901961, 0.0901961, 0.0901961)
+Frame_18.BorderColor3 = Color3.new(0, 0, 0)
+Frame_18.BorderSizePixel = 0
+Frame_18.Position = UDim2.new(0, 1, 0, 1)
+Frame_18.Size = UDim2.new(1, -2, 1, -2)
+Frame_18.ZIndex = 2
+
+ScrollingFrame_3.Parent = Frame_18
+ScrollingFrame_3.BackgroundColor3 = Color3.new(0, 0, 0)
+ScrollingFrame_3.BackgroundTransparency = 1
+ScrollingFrame_3.BorderColor3 = Color3.new(0, 0, 0)
+ScrollingFrame_3.BorderSizePixel = 0
+ScrollingFrame_3.Size = UDim2.new(1, 0, 1, 0)
+ScrollingFrame_3.ZIndex = 4
+ScrollingFrame_3.BottomImage = "rbxassetid://7783554086"
+ScrollingFrame_3.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollingFrame_3.MidImage = "rbxassetid://7783554086"
+ScrollingFrame_3.ScrollBarThickness = 5
+ScrollingFrame_3.TopImage = "rbxassetid://7783554086"
+
+UIListLayout_4.Parent = ScrollingFrame_3
+UIListLayout_4.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout_4.SortOrder = Enum.SortOrder.LayoutOrder
+
+UIPadding_5.Parent = ScrollingFrame_3
+UIPadding_5.PaddingBottom = UDim.new(0, 15)
+UIPadding_5.PaddingTop = UDim.new(0, 10)
+
+Container_5.Name = "Container"
+Container_5.Parent = ScrollingFrame_3
+Container_5.AnchorPoint = Vector2.new(0.5, 0.5)
+Container_5.BackgroundColor3 = Color3.new(0, 0, 0)
+Container_5.BackgroundTransparency = 1
+Container_5.BorderColor3 = Color3.new(0, 0, 0)
+Container_5.BorderSizePixel = 0
+Container_5.Position = UDim2.new(0.5, 0, 0.5, 0)
+Container_5.Size = UDim2.new(1, 0, 0.100000001, 0)
+Container_5.ZIndex = 3
+
+local function createNotification(text)
+	local Notif = Instance.new("Frame");local TextLabel_8 = Instance.new("TextLabel");local UIPadding_6 = Instance.new("UIPadding")
+	Notif.Name = "Notif"
+	Notif.Parent = Container_5
+	Notif.BackgroundColor3 = Color3.new(1, 1, 1)
+	Notif.BackgroundTransparency = 1
+	Notif.BorderColor3 = Color3.new(0, 0, 0)
+	Notif.BorderSizePixel = 0
+	Notif.Size = UDim2.new(1, 0, 1.25, 0)
+	Notif.ZIndex = 5
+
+	TextLabel_8.Parent = Notif
+	TextLabel_8.AnchorPoint = Vector2.new(0.5, 0.5)
+	TextLabel_8.BackgroundColor3 = Color3.new(0, 0, 0)
+	TextLabel_8.BackgroundTransparency = 1
+	TextLabel_8.BorderColor3 = Color3.new(0, 0, 0)
+	TextLabel_8.BorderSizePixel = 0
+	TextLabel_8.Position = UDim2.new(0.5, 0, 0.5, 0)
+	TextLabel_8.Size = UDim2.new(1, 0, 1, 0)
+	TextLabel_8.ZIndex = 9
+	TextLabel_8.FontFace = Font.fromId(11598121416, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+	TextLabel_8.Text = text
+	TextLabel_8.TextColor3 = Color3.new(0.678431, 0.678431, 0.678431)
+	TextLabel_8.TextSize = 12
+	TextLabel_8.TextXAlignment = Enum.TextXAlignment.Left
+	
+	UIPadding_6.Parent = TextLabel_8
+	UIPadding_6.PaddingLeft = UDim.new(0, 10)
+end
+
+local function createNotification_special(text)
+	local Notif_2 = Instance.new("Frame");local TextLabel_9 = Instance.new("TextLabel");local UIPadding_7 = Instance.new("UIPadding")
+	Notif_2.Name = "Notif"
+	Notif_2.Parent = Container_5
+	Notif_2.BackgroundColor3 = Color3.new(0.101961, 0.101961, 0.101961)
+	Notif_2.BorderColor3 = Color3.new(0, 0, 0)
+	Notif_2.BorderSizePixel = 0
+	Notif_2.Size = UDim2.new(1, 0, 1.25, 0)
+	Notif_2.ZIndex = 5
+
+	TextLabel_9.Parent = Notif_2
+	TextLabel_9.AnchorPoint = Vector2.new(0.5, 0.5)
+	TextLabel_9.BackgroundColor3 = Color3.new(0, 0, 0)
+	TextLabel_9.BackgroundTransparency = 1
+	TextLabel_9.BorderColor3 = Color3.new(0, 0, 0)
+	TextLabel_9.BorderSizePixel = 0
+	TextLabel_9.Position = UDim2.new(0.5, 0, 0.5, 0)
+	TextLabel_9.Size = UDim2.new(1, 0, 1, 0)
+	TextLabel_9.ZIndex = 9
+	TextLabel_9.FontFace = Font.fromId(11598121416, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+	TextLabel_9.Text = text
+	TextLabel_9.TextColor3 = Color3.new(0.482353, 0.760784, 0.0823529)
+	TextLabel_9.TextSize = 12
+	TextLabel_9.TextXAlignment = Enum.TextXAlignment.Left
+	
+	UIPadding_7.Parent = TextLabel_9
+	UIPadding_7.PaddingLeft = UDim.new(0, 10)
+end
+
+local function destroy_all_notif()
+	for _, v in pairs(Container_5:GetChildren()) do
+		if v:IsA("Frame") and v.Name:match("Notif") then
+			v:Destroy()
+		end
+	end
+end
+
+UIListLayout_5.Parent = Container_5
+UIListLayout_5.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout_5.SortOrder = Enum.SortOrder.LayoutOrder
+
+Frame_19.Parent = Options_2
+Frame_19.BackgroundColor3 = Color3.new(0.0901961, 0.0901961, 0.0901961)
+Frame_19.BorderColor3 = Color3.new(0, 0, 0)
+Frame_19.BorderSizePixel = 0
+Frame_19.Position = UDim2.new(0, 9, 0, -1)
+Frame_19.Size = UDim2.new(0, 37, 0, 2)
+Frame_19.ZIndex = 5
+
+TextLabel_10.Parent = Options_2
+TextLabel_10.AnchorPoint = Vector2.new(0, 0.5)
+TextLabel_10.BackgroundColor3 = Color3.new(0, 0, 0)
+TextLabel_10.BackgroundTransparency = 1
+TextLabel_10.BorderColor3 = Color3.new(0, 0, 0)
+TextLabel_10.BorderSizePixel = 0
+TextLabel_10.Position = UDim2.new(0, 12, 0, 0)
+TextLabel_10.Size = UDim2.new(1, -26, 0, 15)
+TextLabel_10.ZIndex = 5
+TextLabel_10.FontFace = Font.fromId(11598121416, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+TextLabel_10.Text = "Output"
+TextLabel_10.TextColor3 = Color3.new(0.803922, 0.803922, 0.803922)
+TextLabel_10.TextSize = 11
+TextLabel_10.TextXAlignment = Enum.TextXAlignment.Left
+
+UIListLayout_6.Parent = Bottom
+UIListLayout_6.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout_6.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout_6.Padding = UDim.new(0, 18)
+
+UIListLayout_7.Parent = Hub
+UIListLayout_7.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout_7.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout_7.Padding = UDim.new(0, 18)
+
+_145e8eae6ead40fea442b71a9f9af5b0.Name = "145e8eae-6ead-40fe-a442-b71a9f9af5b0"
+_145e8eae6ead40fea442b71a9f9af5b0.Parent = Container_4
+_145e8eae6ead40fea442b71a9f9af5b0.BackgroundColor3 = Color3.new(0, 0, 0)
+_145e8eae6ead40fea442b71a9f9af5b0.BackgroundTransparency = 1
+_145e8eae6ead40fea442b71a9f9af5b0.BorderColor3 = Color3.new(0, 0, 0)
+_145e8eae6ead40fea442b71a9f9af5b0.BorderSizePixel = 0
+_145e8eae6ead40fea442b71a9f9af5b0.Size = UDim2.new(1, 0, 1, 0)
+_145e8eae6ead40fea442b71a9f9af5b0.Image = "rbxassetid://8547666218"
+_145e8eae6ead40fea442b71a9f9af5b0.ImageColor3 = Color3.new(0.0470588, 0.0470588, 0.0470588)
+_145e8eae6ead40fea442b71a9f9af5b0.ScaleType = Enum.ScaleType.Tile
+_145e8eae6ead40fea442b71a9f9af5b0.TileSize = UDim2.new(0, 8, 0, 8)
+
+e284d76cc1514c3392c45dd56aafc55d.Name = "e284d76c-c151-4c33-92c4-5dd56aafc55d"
+e284d76cc1514c3392c45dd56aafc55d.Parent = Container
+e284d76cc1514c3392c45dd56aafc55d.BackgroundColor3 = Color3.new(0.0470588, 0.0470588, 0.0470588)
+e284d76cc1514c3392c45dd56aafc55d.BorderColor3 = Color3.new(0, 0, 0)
+e284d76cc1514c3392c45dd56aafc55d.BorderSizePixel = 0
+e284d76cc1514c3392c45dd56aafc55d.Size = UDim2.new(1, 0, 0, 4)
+
+_76f96bb200604eaca9076b424f8aba60.Name = "76f96bb2-0060-4eac-a907-6b424f8aba60"
+_76f96bb200604eaca9076b424f8aba60.Parent = e284d76cc1514c3392c45dd56aafc55d
+_76f96bb200604eaca9076b424f8aba60.BackgroundColor3 = Color3.new(0, 0, 0)
+_76f96bb200604eaca9076b424f8aba60.BackgroundTransparency = 1
+_76f96bb200604eaca9076b424f8aba60.BorderColor3 = Color3.new(0, 0, 0)
+_76f96bb200604eaca9076b424f8aba60.BorderSizePixel = 0
+_76f96bb200604eaca9076b424f8aba60.Position = UDim2.new(0, 1, 0, 1)
+_76f96bb200604eaca9076b424f8aba60.Size = UDim2.new(1, -2, 1, -2)
+_76f96bb200604eaca9076b424f8aba60.Image = "rbxassetid://8508019876"
+
+TextButton_3.MouseButton1Down:Connect(function()
+	Loader:Destroy()
+end)
+--
+
+local KeyGuardLibrary = loadstring(game:HttpGet("https://cdn.keyguardian.org/library/v1.0.0.lua"))()
+local trueData = "8be3457830b84d29b4383be1c13f0113"
+local falseData = "a46179e0ab054e91b385ca0ba0082c4f"
+
+KeyGuardLibrary.Set({
+	publicToken = "2a21335b35cc47f493116eff728af108",
+	privateToken = "db543079639b44c9b2f67354e3e689d4",
+	trueData = trueData,
+	falseData = falseData,
+})
+
+local key = _G.xmmxmxmxmmxmxmsdfksdmfkmsdkfmsdeqwq
+local var = _G.xmmxmxmxmmxmxmsdfksdmfkmsdkfmsdeqwqdddd
+
+local response = KeyGuardLibrary.validateDefaultKey(key)
+
+if response == trueData and var== true then
+	createNotification("Checking your subscriptions..")
+	wait(0.5)
+	createNotification("You are subscribed.")
+	wait(1)
+	destroy_all_notif()
+	createNotification("Welcome back, ".. game.Players.LocalPlayer.DisplayName)
+	createNotification_special("Warning: your executor must be level 8+")
+	hwid_checked = true
+else
+	createNotification("Checking your subscriptions..")
+	wait(0.5)
+	createNotification("You are not subscribed.")
+	wait(5)
+	destroy_all_notif()
+	Loader:Destroy()
+end
+--
+destroy_all_notif()
+--
+if hwid_checked == true then
+local function MainFunction()
+	local main = Loader
+
+	local select = TextButton
+	local load2 = TextButton_2
+	local selected = false
+	local selected_2 = false
+		select.MouseButton1Down:Connect(function()
+			if  hwid_checked == true  then
+		selected = not selected
+
+		if selected== true and hwid_checked == true  then
+			load.BackgroundColor3=Color3.fromRGB(30, 30, 30)
+			selected = true
+		else
+			load.BackgroundColor3=Color3.fromRGB(26, 26, 26)
+			selected= false
+				end
+			end
+	end)
+	load2.MouseButton1Down:Connect(function()
+			if selected == true and hwid_checked == true  then
+			load2.Interactable= false
+			select.Interactable= false
+			createNotification("Loading Project Delta script..")
+			wait(0.5)
+			createNotification("Please stand by..")
+			wait(5)
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/bobercoderny/gamesqueeze/refs/heads/main/script"))()
+			main:Destroy()
+		end
+	end)
+end
+	coroutine.wrap(MainFunction)()
+end
