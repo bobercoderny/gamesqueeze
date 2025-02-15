@@ -1,0 +1,2144 @@
+-- gamesqueeze source
+
+repeat 
+	task.wait() 
+until game:IsLoaded()
+
+if not isfile("hitsound_1") and not isfile("hitsound_2") then
+	writefile("hitsound_1", game:HttpGet("https://drive.google.com/uc?export=download&id=1VIA-qckz14LdaN1fGWKgsCrY-c8AZKwd"));
+	writefile("hitsound_2", game:HttpGet("https://drive.google.com/uc?export=download&id=1_HtwSnjUKW6kyU1wwy6SQUmsucfQRI_3"));
+end
+
+--
+local library = loadstring(game:HttpGet("https://pastebin.com/raw/E7anXbMV"))()
+--
+local aimogfunc = require(game.ReplicatedStorage.Modules.FPS.Bullet).CreateBullet
+local v311 = require(game.ReplicatedStorage.Modules:WaitForChild("UniversalTables"))
+local globalist11 = v311.ReturnTable("GlobalIgnoreListProjectile")
+--
+-- // services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local ServerScriptService = game:GetService("ServerScriptService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local SoundService = game:GetService("SoundService")
+--
+local aimmodfunc
+--
+local old_exp = Lighting.ExposureCompensation
+--
+local AmmoTypes = game.ReplicatedStorage:FindFirstChild("AmmoTypes_gamesqueeze") or game.ReplicatedStorage:FindFirstChild("AmmoTypes") and game.ReplicatedStorage:FindFirstChild("AmmoTypes"):Clone()
+if AmmoTypes then 
+	AmmoTypes.Name = "AmmoTypes_gamesqueeze" 
+end
+
+local jitterValue = 0.1
+local spinValue = 0.1
+--
+--
+local aimtarget = nil
+local aimtargetpart = nil
+--
+local LP = Players.LocalPlayer
+local PlayerInventory = game.ReplicatedStorage.Players[LP.Name].Inventory
+--
+local tracbool = true
+local tracwait = 25
+local traccolor = Color3.fromRGB(0,4,255)
+local tractexture = "http://www.roblox.com/asset/?id=7151778302"
+--
+local aimpart = "Head"
+local aimtype = "Prediction"--Instant Hit
+local wcamera = workspace.CurrentCamera
+--
+local aimFRIENDLIST = {}
+local friendlistmode = "Blacklist"
+local friendlistbots = false
+local aimchance = 100
+local aimfov = 250
+local aimdistance = 800 
+local selftrack_data = {}
+local selftrack_update = 0
+--
+--
+local not_unloaded = true
+local aimbool = false
+local aimdebug1 = false
+local aimdebug2 = false
+local aimdebug3 = false
+local aimselftrack = false
+local aimbots = false
+local aimvischeck = false
+local aimdistcheck = false
+local aimbang = true
+local aimtrigger = false
+local aiminfrange = false
+--
+local aimfakewait = 0
+local multitaps = 1
+--
+function Notify(tt, tx)
+	game:GetService("StarterGui"):SetCore("SendNotification", {
+		Title = tt,
+		Text = tx,
+		Duration = 4
+	})
+end
+
+local function Lerp(a, b, c)
+	c = c or 1 / 8
+
+	local offset = math.abs(b - a)
+	if (offset < c) then 
+		return b 
+	end 
+
+	return a + (b - a) * c
+end
+
+local aimignoreparts = {}
+for i,v in ipairs(workspace:GetDescendants()) do
+	if v:GetAttribute("PassThrough") then
+		table.insert(aimignoreparts, v)
+	end
+end
+
+local function isonscreen(object)
+	local _, bool = wcamera:WorldToScreenPoint(object.Position)
+	return bool
+end
+
+function getcurrentammo(gun)
+	if not gun then return nil end
+	local loadedfold = gun:FindFirstChild("LoadedAmmo", true)
+	if not loadedfold then return nil end
+	local firstammo = loadedfold:FindFirstChild("1")
+	if not firstammo then return nil end
+
+	local ammoname = firstammo:GetAttribute("AmmoType")
+	local ammo = game.ReplicatedStorage.AmmoTypes:FindFirstChild(ammoname)
+	if not ammo then return nil end
+
+	return ammo
+end
+
+function getcurrentgun(plr)
+	local char = plr.Character
+	if not char then return nil, nil end
+	local invchar = game.ReplicatedStorage.Players:FindFirstChild(game.Players.LocalPlayer.Name).Inventory
+	if not invchar then return nil, nil end
+
+	local gun = nil
+	local gunname = nil
+	local guninv = nil
+
+	for _, desc in ipairs(char:GetDescendants()) do
+		if desc:IsA("Model") and desc:FindFirstChild("ItemRoot") and desc:FindFirstChild("Attachments") then
+			gun = desc
+			gunname = desc.Name
+			guninv = invchar:FindFirstChild(gunname)
+		end
+	end
+
+	return gunname, gun, guninv
+end
+
+local aimfovcircle = Drawing.new("Circle")
+local aimtargetname = Drawing.new("Text")
+local aimtargetshots = Drawing.new("Text")
+
+aimfovcircle.Visible = false
+aimfovcircle.Radius = aimfov
+aimfovcircle.Thickness = 2
+aimfovcircle.Filled = false
+aimfovcircle.Transparency = 1
+aimfovcircle.Position = Vector2.new(wcamera.ViewportSize.X / 2, wcamera.ViewportSize.Y / 2)
+aimtargetname.Text = "None"
+aimtargetname.Position = Vector2.new(wcamera.ViewportSize.X / 2, wcamera.ViewportSize.Y / 2 + aimfov + 20) 
+aimtargetname.Size = 24
+aimtargetname.Color = Color3.fromRGB(255,255,255)
+aimtargetname.Visible = true
+aimtargetname.Center = true
+aimtargetname.Outline = true
+aimtargetname.OutlineColor = Color3.new(0, 0, 0)
+aimtargetshots.Text = " "
+aimtargetshots.Position = Vector2.new(wcamera.ViewportSize.X / 2, wcamera.ViewportSize.Y / 2 + aimfov + 30) 
+aimtargetshots.Size = 20
+aimtargetshots.Color = Color3.fromRGB(255,255,255)
+aimtargetshots.Visible = true
+aimtargetshots.Center = true
+aimtargetshots.Outline = true
+aimtargetshots.OutlineColor = Color3.new(0, 0, 0)
+--
+local function isvisible(char, object)
+	local localplayer = LP
+	if not localplayer.Character or not localplayer.Character:FindFirstChild("HumanoidRootPart") then
+		return false
+	end
+	if aimvischeck == false then
+		return true
+	end
+
+	local origin = localplayer.Character.HumanoidRootPart.Position + Vector3.new(0, 1, 0)
+	if aimselftrack then
+		local plrping = localplayer:GetNetworkPing()
+		local key = math.floor((plrping + 5) / 10) * 10
+
+		if selftrack_data[key] ~= nil then
+			origin = selftrack_data[key]
+		end
+	end
+
+	local pos = object.Position
+	local dir = pos - origin
+	local dist = dir.Magnitude + 5
+	local penetrated = true
+	dir = dir.Unit
+
+	local params = RaycastParams.new()
+	params.IgnoreWater = true
+	params.CollisionGroup = "WeaponRay"
+	params.FilterDescendantsInstances = {
+		localplayer.Character:GetChildren(),
+		wcamera:GetChildren(),
+		globalist11,
+		aimignoreparts
+	}
+
+	local ray = workspace:Raycast(origin, dir * dist, params)
+	if aimbang then
+		if ray and ray.Instance:IsDescendantOf(char) then
+			return true
+		elseif ray and ray.Instance.Name ~= "Terrain" and not ray.Instance:GetAttribute("NoPen") then
+			local armorpen4 = 10
+			if globalammo then
+				armorpen4 = globalammo:GetAttribute("ArmorPen")
+			end
+
+			local FunctionLibraryExtension = require(game.ReplicatedStorage.Modules.FunctionLibraryExtension)
+			local armorpen1, newpos2 = FunctionLibraryExtension.Penetration(FunctionLibraryExtension, ray.Instance, ray.Position, dir, armorpen4)
+			if armorpen1 == nil or newpos2 == nil then
+				return false
+			end
+
+			local neworigin = ray.Position + dir * 0.01
+			local newray = workspace:Raycast(neworigin, dir * (dist - (neworigin - origin).Magnitude), params)
+			if newray and newray.Instance:IsDescendantOf(char) then
+				return true
+			end
+		end
+	else
+		if ray and ray.Instance:IsDescendantOf(char) then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function choosetarget()
+
+	local cent = Vector2.new(wcamera.ViewportSize.X / 2, wcamera.ViewportSize.Y / 2)
+	local cdist = math.huge
+	local ctar = nil
+	local cpart = nil
+
+	local ammodistance = 999999999
+	if aimdistcheck and globalammo then
+		ammodistance = globalammo:GetAttribute("MuzzleVelocity")
+	end
+
+	local bparts = {
+		"Head",
+		"HeadTopHitBox",
+		"FaceHitBox",
+		"UpperTorso",
+		"LowerTorso",
+		"LeftUpperArm",
+		"RightUpperArm",
+		"LeftLowerArm",
+		"RightLowerArm",
+		"LeftHand",
+		"RightHand",
+		"LeftUpperLeg",
+		"RightUpperLeg",
+		"LeftLowerLeg",
+		"RightLowerLeg",
+		"LeftFoot",
+		"RightFoot"
+	}
+
+	local function chooseTpart(charact)
+
+		if aimpart == "Head" then
+			return charact:FindFirstChild("Head")
+		elseif aimpart == "HeadTop" then
+			return charact:FindFirstChild("HeadTopHitBox")
+		elseif aimpart == "Face" then
+			return charact:FindFirstChild("FaceHitBox")
+		elseif aimpart == "Torso" then
+			return charact:FindFirstChild("UpperTorso")
+		elseif aimpart == "Scripted" then
+			local head = charact:FindFirstChild("Head")
+			local upperTorso = charact:FindFirstChild("UpperTorso")
+			if not isvisible(charact, head) then
+				return upperTorso
+			else
+				return head
+			end
+		elseif aimpart == "Random" then
+			return charact:FindFirstChild(bparts[math.random(1, #bparts)])
+		end
+	end
+
+	if aimbots then --priority 2 (bots)
+		local localplayer = LP
+		for _, botfold in ipairs(workspace.AiZones:GetChildren()) do
+			for _, bot in ipairs(botfold:GetChildren()) do
+				if bot:IsA("Model") and bot:FindFirstChild("Humanoid") and bot.Humanoid.Health > 0 then
+					if friendlistbots then
+						if friendlistmode == "Blacklist" then 
+							if table.find(aimFRIENDLIST, bot.Name) ~= nil then
+								continue
+							end
+						elseif friendlistmode == "Whitelist" then 
+							if table.find(aimFRIENDLIST, bot.Name) == nil then
+								continue
+							end
+						end
+					end
+
+					local potroot = chooseTpart(bot)
+					if potroot and LP.Character then
+						local spoint = wcamera:WorldToViewportPoint(potroot.Position)
+						local optpoint = Vector2.new(spoint.X, spoint.Y)
+						local dist = (optpoint - cent).Magnitude
+
+						local betweendist = (localplayer.Character.PrimaryPart.Position - potroot.Position).Magnitude * 0.3336
+						local betweendistSTUDS = (localplayer.Character.PrimaryPart.Position - potroot.Position).Magnitude
+						if dist <= aimfovcircle.Radius and dist < cdist and betweendist < aimdistance and betweendistSTUDS < ammodistance then
+							local canvis = isvisible(bot, potroot)
+							if canvis and isonscreen(potroot) then
+								cdist = dist
+								ctar = bot
+								cpart = potroot
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	for _, pottar in ipairs(game.Players:GetPlayers()) do --priority 1 (players)
+		local localplayer = LP
+		if pottar ~= localplayer and pottar.Character and localplayer.Character.PrimaryPart ~= nil then
+			if friendlistmode == "Blacklist" then 
+				if table.find(aimFRIENDLIST, pottar.Name) ~= nil then
+					continue
+				end
+			elseif friendlistmode == "Whitelist" then 
+				if table.find(aimFRIENDLIST, pottar.Name) == nil then
+					continue
+				end
+			end
+
+			local potroot = chooseTpart(pottar.Character)
+			if potroot then
+				local spoint = wcamera:WorldToViewportPoint(potroot.Position)
+				local optpoint = Vector2.new(spoint.X, spoint.Y)
+				local dist = (optpoint - cent).Magnitude
+
+				local betweendist = (localplayer.Character.PrimaryPart.Position - potroot.Position).Magnitude * 0.3336
+				local betweendistSTUDS = (localplayer.Character.PrimaryPart.Position - potroot.Position).Magnitude
+				if dist <= aimfovcircle.Radius and dist < cdist and betweendist < aimdistance and betweendistSTUDS < ammodistance then
+					local canvis = isvisible(pottar.Character, potroot)
+					if canvis and isonscreen(potroot) then
+						cdist = dist
+						ctar = pottar
+						cpart = potroot
+					end
+				end
+			end
+		end
+	end
+
+	if ctar == nil then
+		aimtarget = nil
+		aimtargetpart = nil
+	else
+		aimtarget = ctar
+		aimtargetpart = cpart
+	end
+end
+
+local function predictpos(tpart, bulletspeed, bulletdrop)
+	local velocity = tpart.Velocity
+	local distance = (wcamera.CFrame.Position - tpart.CFrame.Position).Magnitude
+	local tth = (distance / bulletspeed)
+	local predict1 = tpart.CFrame.Position + (velocity * tth)
+	local delta = (predict1 - tpart.CFrame.Position).Magnitude
+	local finalspeed = bulletspeed - 0.013 * bulletspeed ^ 2 * tth ^ 2
+	tth += (delta / finalspeed)
+	local predictres1 = tpart.CFrame.Position + (velocity * tth)
+	local predictres2 = bulletdrop * tth ^ 2
+	if tostring(drop_timing):find("nan") then
+		predictres2 = 0
+	end
+	return predictres1 -- + Vector3.new(0,predictres2,0)
+end
+
+
+
+local function runtracer(start, endp)
+	local beam = Instance.new("Beam")
+	beam.Name = "LineBeam"
+	beam.Parent = game.Workspace
+	local startpart = Instance.new("Part")
+	startpart.CanCollide = false
+	startpart.CanQuery = false
+	startpart.Transparency = 1
+	startpart.Position = start
+	startpart.Parent = workspace
+	startpart.Anchored = true
+	startpart.Size = Vector3.new(0.05, 0.05, 0.05)
+	local endpart = Instance.new("Part")
+	endpart.CanCollide = false
+	endpart.CanQuery = false
+	endpart.Transparency = 1
+	endpart.Position = endp
+	endpart.Parent = workspace
+	endpart.Anchored = true
+	endpart.Size = Vector3.new(0.05, 0.05, 0.05)
+	beam.Attachment0 = Instance.new("Attachment", startpart)
+	beam.Attachment1 = Instance.new("Attachment", endpart)
+	beam.Color = ColorSequence.new(traccolor,  traccolor)
+	beam.Width0 = 0.05
+	beam.Width1 = 0.05
+	beam.FaceCamera = true
+	beam.Transparency = NumberSequence.new(0)
+	beam.LightEmission = 1
+	beam.LightInfluence = 1
+
+	if tractexture ~= nil then
+		beam.Texture = tractexture
+		if tractexture then
+			beam.TextureSpeed = 5
+			beam.TextureLength = (endp - start).Magnitude
+			beam.Width0 = 0.5
+			beam.Width1 = 0.5
+		end
+	end
+
+	wait(tracwait)
+
+	beam:Destroy()
+	startpart:Destroy()
+	endpart:Destroy()
+end
+--
+local window = library:CreateWindow({})
+--
+local rage = window:CreatePage({Icon = "rbxassetid://8547236654"})
+--local antiaim = window:CreatePage({Icon = "rbxassetid://1234655861"})
+local aimbot = window:CreatePage({Icon = "rbxassetid://8547249956"})
+local visuals = window:CreatePage({Icon = "rbxassetid://8547254518"})
+local setting = window:CreatePage({Icon = "rbxassetid://8547256547"})
+local skins = window:CreatePage({Icon = "rbxassetid://8547258459"})
+local config = window:CreatePage({Icon = "rbxassetid://8547269749"})
+--
+
+-- rage
+local weaponSection = rage:CreateSection({Name = "Weapon type", Size = 52, Side = "Left"})
+local rageSection = rage:CreateSection({Name = "Aimbot", Size = 440, Side = "Left"})
+local rageSection2 = rage:CreateSection({Name = "Other", Size = 288, Side = "Right"})
+local antiaim = rage:CreateSection({Name = "Anti-Aim", Size = 200, Side = "Right"})
+local SettingSection = setting:CreateSection({Name = "Settings", Size = 200, Side = "Right"})
+-- visuals
+local playeresp = visuals:CreateSection({Name = "Player ESP", Size = 330, Side = "Left"})
+local player_section = visuals:CreateSection({Name = "Player", Size = 158, Side = "Left"})
+local world_section = visuals:CreateSection({Name = "World", Size = 200, Side = "Right"})
+local effects = visuals:CreateSection({Name = "Viewmodel", Size = 288, Side = "Right"})
+
+-- config
+local configsection = config:CreateSection({Name = "Presets", Size = 158, Side = "Left"})
+
+--
+local menuKey = SettingSection:CreateKeybind({
+	Name = "Menu key",
+	Iznachalno = "RightShift",
+	Callback = function(state)
+		window.Key =  state
+	end
+})
+local accentColor = SettingSection:CreateColorpicker({
+	Name = "Menu color", 
+	State = Color3.fromRGB(147, 167, 41), 
+	Callback = function(selectedColor)
+		window.Accent= selectedColor
+	end
+})
+--
+--
+local sizable = SettingSection:CreateToggle({
+	Name = "Lock menu layout",
+	State = true,
+	Callback = function(state)
+		window.MenuResize = not state
+	end
+})	
+--
+
+local weapon = "Global"
+
+local enabled = weaponSection:CreateToggle({
+	Name = "Global",
+	State = false,
+	Callback = function(state)
+		if state then
+
+		end
+	end
+})	
+
+local num = {
+	GunZoom = 5,
+}
+
+local variables = {
+	RemoveSpread = false,
+	RapidFire = false,
+	Viewmodel = false,
+	GunZoom = false,
+	Sway = false,
+	ViewmodelEdit= false,
+	ViewmodelTextures = false,
+}
+
+local GunList = {
+	AKM = "AKM",
+	AKMN = "AKMN",
+	AsVal = "AsVal",
+	IZh12 = "IZh12",
+	IZh81 = "IZh81",
+	M4 = "M4",
+	MK23 = "MK23",
+	MP443 = "MP443",
+	MP5SD = "MP5SD",
+	Makarov = "Makarov",
+	Mosin = "Mosin",
+	PKM = "PKM",
+	PPSH41 = "PPSH41",
+	R700 = "R700",
+	RPG7 = "RPG7",
+	SKS = "SKS",
+	SVD = "SVD",
+	Saiga12 = "Saiga12",
+	TFZ0 = "TFZ0",
+	TFZ98S = "TFZ98S",
+	TT33 = "TT33",
+	VZ61 = "VZ61",
+}
+local originalSettings = {}
+local RapidFire = rageSection2:CreateToggle({
+	Name = "RapidFire",
+	State = false,
+	Callback = function(state)
+		variables.RapidFire = state
+		if state == true then
+			for i,v in ipairs(PlayerInventory:GetChildren()) do
+				local SettingsModule = require(v.SettingsModule)
+
+				if not originalSettings[v.Name] then
+					originalSettings[v.Name] = {
+						FireModes = SettingsModule.FireModes,
+						FireMode = SettingsModule.FireMode,
+						FireRate = SettingsModule.FireRate
+					}
+				end
+
+				SettingsModule.FireModes = {"Semi", "Auto"}
+				SettingsModule.FireMode = 'Auto'
+				SettingsModule.FireRate = 0.002
+			end
+		else
+			for i, v in ipairs(PlayerInventory:GetChildren()) do
+				local SettingsModule = require(v.SettingsModule)
+
+				if SettingsModule and originalSettings[v.Name] then
+					SettingsModule.FireModes = originalSettings[v.Name].FireModes
+					SettingsModule.FireMode = originalSettings[v.Name].FireMode
+					SettingsModule.FireRate = originalSettings[v.Name].FireRate
+				end
+			end
+		end
+	end
+})	
+
+local RemoveSpread = rageSection2:CreateToggle({
+	Name = "RemoveSpread",
+	State = false,
+	Callback = function(state)
+		variables.RemoveSpread = state
+		if state == true then
+			for i,v in ipairs(game.ReplicatedStorage.AmmoTypes:GetChildren()) do
+				if v then
+					v:SetAttribute("ProjectileDrop", 0)
+					v:SetAttribute("Tracer", true)
+					v:SetAttribute("Drag", 0)
+					v:SetAttribute("MuzzleVelocity", 3000)
+					v:SetAttribute("RecoilStrength", 0)
+					if v:GetAttribute("AccuracyDeviation") then
+						v:SetAttribute("AccuracyDeviation", 0)
+					end
+				end
+			end
+		else
+			for i,v in ipairs(game.ReplicatedStorage.AmmoTypes:GetChildren()) do
+				if v then
+					local realAmmo = AmmoTypes:FindFirstChild(v.Name)
+					if realAmmo then
+						v:SetAttribute("ProjectileDrop", realAmmo:GetAttribute("ProjectileDrop"))
+						v:SetAttribute("Tracer", realAmmo:GetAttribute("Tracer"))
+						v:SetAttribute("Drag", realAmmo:GetAttribute("Drag"))
+						v:SetAttribute("MuzzleVelocity", realAmmo:GetAttribute("MuzzleVelocity"))
+						v:SetAttribute("RecoilStrength", realAmmo:GetAttribute("RecoilStrength"))
+						if v:GetAttribute("AccuracyDeviation") then
+							v:SetAttribute("AccuracyDeviation", realAmmo:GetAttribute("AccuracyDeviation"))
+						end
+					end
+				end
+			end
+		end
+	end
+})	
+local OldWeaponMods_Sway        = {}
+local Sway = rageSection2:CreateToggle({
+	Name = "Sway",
+	State = false,
+	Callback = function(state)
+		variables.Sway = state
+	end
+})	
+
+local OldWeaponMods_QuickAim    = {}
+local Quick_aim = rageSection2:CreateToggle({
+	Name = "Quick aim",
+	State = false,
+	Callback = function(state)
+		if state == true then
+			OldWeaponMods_QuickAim = {}
+			for i,v in next, PlayerInventory:GetChildren() do
+				local module = require(v.SettingsModule)
+
+				table.insert(OldWeaponMods_QuickAim, module.AimInSpeed)
+				table.insert(OldWeaponMods_QuickAim, module.AimOutSpeed)
+
+				module.AimInSpeed = 0
+				module.AimOutSpeed = 0
+			end
+		else
+			for i,v in next, PlayerInventory:GetChildren() do
+				local module = require(v.SettingsModule)
+
+				for i2,v2 in next, OldWeaponMods_QuickAim do
+					module.AimInSpeed = v2
+					module.AimOutSpeed = v2
+				end
+			end
+		end
+	end
+})	
+local hitsoundsdrop 
+local hitsoundID 
+local hitsoundslider
+local hitVolume = 1
+local hitsoundEnabled = false
+local HitSounds = rageSection2:CreateToggle({
+	Name = "Hitsound",
+	State = false,
+	Callback = function(state)
+		if hitsoundsdrop and hitsoundslider then
+			hitsoundsdrop.SetVisibility()
+			hitsoundslider.SetVisibility()
+		end
+		hitsoundEnabled = state
+	end
+})	
+local selectedhitsound = "hitsound_1"
+hitsoundsdrop = rageSection2:CreateDropdown({
+	Name = "",
+	State = 1,
+	Options = {"Skeet new", "Skeet legacy"},
+	Callback = function(selectedOption)
+		if selectedOption == 1 and hitsoundEnabled == true  then
+			selectedhitsound = "hitsound_1"
+			game.ReplicatedStorage.SFX.Hits.ProjectileHits.Blood.Hit.SoundId = getcustomasset("hitsound_1")
+		elseif selectedOption == 2 and hitsoundEnabled == true  then
+			selectedhitsound = "hitsound_2"
+			game.ReplicatedStorage.SFX.Hits.ProjectileHits.Blood.Hit.SoundId = getcustomasset("hitsound_2")
+		end
+	end
+})
+
+hitsoundslider = rageSection2:CreateSlider({Name = "Volume", State = 1, Max = 10, Min = 0.1, Decimals = 0.1, Suffix = "%",Callback= function(val)
+	hitVolume = val
+end})
+
+if hitsoundsdrop and hitsoundslider  then
+	hitsoundsdrop.SetVisibility()
+	hitsoundslider.SetVisibility()
+end
+
+local function updateHitSound()
+	while task.wait() do
+		if hitsoundEnabled == true and not_unloaded == true then
+				game.ReplicatedStorage.SFX.Hits.ProjectileHits.Blood.Hit.RollOffMaxDistance = 1000000
+				game.ReplicatedStorage.SFX.Hits.ProjectileHits.Blood.Hit.RollOffMinDistance = 1000000
+				game.ReplicatedStorage.SFX.Hits.ProjectileHits.Blood.Hit.Volume = hitVolume
+				game.ReplicatedStorage.SFX.Hits.ProjectileHits.Blood.Hit.PlaybackSpeed = 1
+			end
+	end
+end
+task.spawn(updateHitSound)
+local hitmarkerColor = Color3.fromRGB(162, 0, 255)
+local hitmarkerTexture = "rbxassetid://10181263678"
+local hitmarker = false
+
+local WorldHitmarkers = rageSection2:CreateToggle({
+	Name = "World Hitmarker",
+	State = false,
+	Callback = function(state)
+		hitmarker = state
+	end
+})	
+
+local Viewmodel= {
+	Color = Color3.fromRGB(166, 167, 255),
+	Material = "ForceField",
+	ColorVar = false,
+	MaterialVar = false,
+}
+
+
+
+-- weapon decor
+
+--[[local global_frame = Instance.new("TextButton")
+global_frame.Parent= enabled.Section.Holder:FindFirstChild("Frame")
+global_frame.Position = UDim2.new(0.9, -20,0.5, 0)
+global_frame.Size = UDim2.new(0.6,0, 0, 60)
+global_frame.AnchorPoint = Vector2.new(0.5, 0.5)
+global_frame.BackgroundTransparency = 1
+global_frame.Name = "<3"
+
+local global_image = Instance.new("ImageLabel")
+global_image.Parent= global_frame
+global_image.Name= "<3"
+global_image.ZIndex= 1488
+global_image.BackgroundTransparency= 1
+global_image.AnchorPoint = Vector2.new(0.5, 0.5)
+global_image.Image = "rbxassetid://81142678231533"
+global_image.Size = UDim2.new(0, 25, 0, 25)
+global_image.Position = UDim2.new(0.5, -2,0.5, 0)
+
+
+local global_cur = Instance.new("Frame",global_image.Parent)
+global_cur.Parent= enabled.Section.Holder:FindFirstChild("Frame")
+global_cur.Name= "<3"
+global_cur.ZIndex= 1488
+global_cur.BackgroundTransparency= 1
+global_cur.AnchorPoint = Vector2.new(0.5, 0.5)
+global_cur.Size = UDim2.new(0, 15,0, 14)
+global_cur.Position = UDim2.new(1, -15,0.5, 0)
+
+local globalCurr = Instance.new("ImageLabel",global_cur)
+globalCurr.Parent=global_cur
+globalCurr.Name= "dada"
+globalCurr.ZIndex= 99999
+globalCurr.BackgroundTransparency= 1
+globalCurr.AnchorPoint = Vector2.new(0,0)
+globalCurr.Image = "rbxassetid://8548723563"
+globalCurr.Size = UDim2.new(0, 7,0, 6)
+globalCurr.Position = UDim2.new(0, 4,0, 4)
+
+global_frame.MouseButton1Down:Connect(function()
+	print("test")
+end)--]]
+
+-- // variables 
+
+local enabled_esp = false
+local global_aimbot = false
+local hit_marker_flag = false
+local enabled_aa= false
+local state_aa = 1
+local hitsound_str = 1
+--  // 
+
+local originalColors = {}
+
+local old_sky = Lighting:FindFirstChildOfClass("Sky"):Clone()
+local old_time = Lighting.ClockTime
+
+local function restoreOriginalColors()
+	for partName, color in pairs(originalColors) do
+		local part = LP.Character:FindFirstChild(partName)
+		if part and part:IsA("BasePart") then
+			part.Color = color
+		end
+	end
+end
+
+local shirtpantsfold = Instance.new("Folder",LP.Character)
+shirtpantsfold.Name= "ShirtPantsFolder"
+
+local old_ambient = Lighting.Ambient
+local new_ambient = Color3.fromRGB(255,255,255)
+
+local espCache = {}
+local function removeEsp(player)
+	if rawget(espCache, player) then
+		for _, drawing in next, espCache[player] do
+			drawing:Remove()
+		end
+		espCache[player] = nil
+	end
+end
+
+local unload = configsection:CreateButton({
+	Name = "unload",
+	Text= "",
+	Callback = function()
+		not_unloaded = false
+		window.Unload()
+		enabled_aa = false
+		enabled_esp = false
+
+		hit_marker_flag = false
+
+		aimtargetname:Remove()
+		aimtargetshots:Remove()
+		aimfovcircle:Remove()
+
+		local aimtarget = nil
+		local aimtargetpart = nil
+
+		require(game.ReplicatedStorage.Modules.FPS.Bullet).CreateBullet = aimogfunc
+
+		for i,v in next, PlayerInventory:GetChildren() do
+			local module = require(v.SettingsModule)
+
+			for i2,v2 in next, OldWeaponMods_QuickAim do
+				module.AimInSpeed = v2
+				module.AimOutSpeed = v2
+			end
+		end
+
+		global_aimbot = false
+		for _, dadada in pairs(game.Players:GetChildren()) do
+			if dadada then
+				removeEsp(dadada)
+			end
+		end
+		if LP and LP.Character and LP.Character.Humanoid then
+			LP.Character.Humanoid.AutoRotate = true
+		end
+		for _, aga in pairs(variables) do
+			aga = false
+		end
+		for i, v in ipairs(PlayerInventory:GetChildren()) do
+			local SettingsModule = require(v.SettingsModule)
+
+			if SettingsModule and originalSettings[v.Name] then
+				SettingsModule.FireModes = originalSettings[v.Name].FireModes
+				SettingsModule.FireMode = originalSettings[v.Name].FireMode
+				SettingsModule.FireRate = originalSettings[v.Name].FireRate
+			end
+		end
+		for i,v in ipairs(game.ReplicatedStorage.AmmoTypes:GetChildren()) do
+			if v then
+				local realAmmo = AmmoTypes:FindFirstChild(v.Name)
+				if realAmmo then
+					v:SetAttribute("ProjectileDrop", realAmmo:GetAttribute("ProjectileDrop"))
+					v:SetAttribute("Tracer", realAmmo:GetAttribute("Tracer"))
+					v:SetAttribute("Drag", realAmmo:GetAttribute("Drag"))
+					v:SetAttribute("MuzzleVelocity", realAmmo:GetAttribute("MuzzleVelocity"))
+					v:SetAttribute("RecoilStrength", realAmmo:GetAttribute("RecoilStrength"))
+					if v:GetAttribute("AccuracyDeviation") then
+						v:SetAttribute("AccuracyDeviation", realAmmo:GetAttribute("AccuracyDeviation"))
+					end
+				end
+			end
+		end
+		
+		Lighting.ExposureCompensation = old_exp
+		Lighting.ClockTime = old_time
+		restoreOriginalColors()
+		Lighting.Ambient= old_ambient
+		local Sky1 = Lighting:FindFirstChildOfClass("Sky")
+		Sky1.Name = "Sky"
+		Sky1.StarCount = old_sky.StarCount
+		Sky1.MoonAngularSize = old_sky.MoonAngularSize
+		Sky1.CelestialBodiesShown = old_sky.CelestialBodiesShown
+		Sky1.SkyboxBk = old_sky.SkyboxBk
+		Sky1.SkyboxDn = old_sky.SkyboxDn
+		Sky1.SkyboxFt = old_sky.SkyboxFt
+		Sky1.SkyboxLf = old_sky.SkyboxLf
+		Sky1.SkyboxRt = old_sky.SkyboxRt
+		Sky1.SkyboxUp = old_sky.SkyboxUp
+
+		--if shirtpantsfold:FindFirstChildOfClass("Shirt") then
+		--	shirtpantsfold:FindFirstChildOfClass("Shirt").Parent = LP.Character
+		--end
+		--if shirtpantsfold:FindFirstChildOfClass("Pants") then
+		--	shirtpantsfold:FindFirstChildOfClass("Pants").Parent = LP.Character
+		--end
+		
+		
+		
+		for _, part in pairs(LP.Character:GetDescendants()) do
+			if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+				originalColors[part.Name] = part.Color
+				part.Material = Enum.Material.Plastic 
+				part.Transparency = 0
+				--part.Color = Color3.fromRGB(255, 255, 255) 
+			elseif part:IsA("Decal") then
+				part.Transparency = 0  
+			end
+		end
+		--shirtpantsfold:Destroy()
+	end
+})
+
+--
+-- esphit
+local hpBarPos = "Left"
+local lerp_speed = 0.7
+
+local box_esp = false
+local hpbar_esp = false
+local update_esp = true
+local names = false
+local name_font = 0
+local fontsizevalue = 9
+local tan, rad = math.tan, math.rad
+local round = function(...)
+	local a = {}
+	for i, v in next, table.pack(...) do
+		a[i] = math.round(v)
+	end
+	return unpack(a)
+end
+
+local wtvp = function(...)
+	local a, b = game.Workspace.CurrentCamera:WorldToViewportPoint(...)
+	return Vector2.new(a.X, a.Y), b, a.Z
+end
+
+-- esp functions
+
+local function lerp(a, b, t)
+	return a + (b - a) * t
+end
+
+local function createEsp(player)
+	if player ~= LP then
+	local drawings = {}
+	drawings.outerBox = Drawing.new("Square")
+	drawings.outerBox.Thickness = 2
+	drawings.outerBox.Filled = false
+	drawings.outerBox.Color = Color3.fromRGB(0, 0, 0)
+	drawings.outerBox.Visible = false
+	drawings.outerBox.Centered = true
+	drawings.outerBox.ZIndex = 8
+
+	drawings.box = Drawing.new("Square")
+	drawings.box.Thickness = 1
+	drawings.box.Filled = false
+	drawings.box.Color = Color3.fromRGB(255, 255, 255)
+	drawings.box.Visible = false
+	drawings.box.Centered = true
+	drawings.box.ZIndex = 9
+
+	drawings.innerBox = Drawing.new("Square")
+	drawings.innerBox.Thickness = 1
+	drawings.innerBox.Filled = false
+	drawings.innerBox.Color = Color3.fromRGB(0, 0, 0)
+	drawings.innerBox.Visible = false
+	drawings.innerBox.Centered = true
+	drawings.innerBox.ZIndex = 7
+
+	drawings.line = Drawing.new("Line")
+	drawings.line.Thickness = 2
+	drawings.line.Color = Color3.fromRGB(0, 255, 0)
+	drawings.line.Visible = false
+	drawings.line.ZIndex = 2
+
+	drawings.text = Drawing.new("Text")
+		drawings.text.Size = fontsizevalue
+	drawings.text.Font = name_font
+	drawings.text.Color = Color3.fromRGB(255, 255, 255)
+	drawings.text.Center = true
+	drawings.text.Outline = true
+	drawings.text.Visible = false
+	drawings.text.ZIndex = 3
+
+		espCache[player] = drawings
+	end
+end
+
+local function updateEsp(player, esp)
+	local character = player and player.Character
+	if character then
+		local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+		if humanoidRootPart then
+			local humanoid = character:FindFirstChildOfClass("Humanoid")
+			local health = humanoid and humanoid.Health or 0
+			local maxHealth = humanoid and humanoid.MaxHealth or 0
+			local healthPercent = maxHealth > 0 and health / maxHealth or 0
+
+			local cframe = humanoidRootPart.CFrame
+			local position, visible, depth = wtvp(cframe.Position)
+
+			local shouldBeVisible = visible and (health > 0)
+
+			esp.outerBox.Visible = shouldBeVisible
+			esp.box.Visible = shouldBeVisible
+			esp.innerBox.Visible = shouldBeVisible
+			if names == true then
+				esp.text.Visible = shouldBeVisible
+				esp.text.Font= name_font
+				esp.text.Size = fontsizevalue
+			end
+			if hpbar_esp == true then
+			esp.line.Visible = shouldBeVisible
+			end
+			if shouldBeVisible then
+				local scaleFactor = 1 / (depth * tan(rad(game.Workspace.CurrentCamera.FieldOfView / 2)) * 2) * 1000
+				local width, height = round(7 * scaleFactor, 10 * scaleFactor)
+				local x, y = round(position.X, position.Y)
+
+				esp.outerBox.Size = Vector2.new(
+					lerp(esp.outerBox.Size.X, width + 4, lerp_speed),
+					lerp(esp.outerBox.Size.Y, height + 4, lerp_speed)
+				)
+				esp.outerBox.Position = Vector2.new(
+					lerp(esp.outerBox.Position.X, round(x - (width + 4) / 2), lerp_speed),
+					lerp(esp.outerBox.Position.Y, round(y - (height + 4) / 2), lerp_speed)
+				)
+
+				esp.box.Size = Vector2.new(
+					lerp(esp.box.Size.X, width, lerp_speed),
+					lerp(esp.box.Size.Y, height, lerp_speed)
+				)
+				esp.box.Position = Vector2.new(
+					lerp(esp.box.Position.X, round(x - width / 2), lerp_speed),
+					lerp(esp.box.Position.Y, round(y - height / 2), lerp_speed)
+				)
+
+				esp.innerBox.Size = Vector2.new(
+					lerp(esp.innerBox.Size.X, width - 2, lerp_speed),
+					lerp(esp.innerBox.Size.Y, height - 2, lerp_speed)
+				)
+				esp.innerBox.Position = Vector2.new(
+					lerp(esp.innerBox.Position.X, round(x - (width - 2) / 2), lerp_speed),
+					lerp(esp.innerBox.Position.Y, round(y - (height - 2) / 2), lerp_speed)
+				)
+
+				local lineX
+				if hpBarPos == "Right" then
+					lineX = x + width / 2 + 4
+				elseif hpBarPos == "Left" then
+					lineX = x - width / 2 - 4
+				end
+
+				local lineYFrom = round(y - height / 2 + height * (1 - healthPercent))
+				local lineYTo = round(y + height / 2)
+
+				if esp.line.Visible then
+					esp.line.From = Vector2.new(
+						lerp(esp.line.From.X, lineX, lerp_speed),
+						lerp(esp.line.From.Y, lineYFrom, lerp_speed)
+					)
+					esp.line.To = Vector2.new(
+						lerp(esp.line.To.X, lineX, lerp_speed),
+						lerp(esp.line.To.Y, lineYTo, lerp_speed)
+					)
+				end
+
+				esp.text.Text = player.Name
+				esp.text.Position = Vector2.new(x, y - height / 2 - 25)
+			end
+		else
+			removeEsp(player)
+		end
+	else
+		esp.outerBox.Visible = false
+		esp.box.Visible = false
+		esp.innerBox.Visible = false
+		esp.line.Visible = false
+		esp.text.Visible = false
+	end
+end
+local esp_box
+local hpbar_enabled
+local names_enabled
+
+local esp_enabled = playeresp:CreateToggle({
+	Name = "Enabled",
+	State = false,
+	Callback = function(state)
+		if esp_box and hpbar_enabled and names_enabled then
+			esp_box.SetVisibility()
+			hpbar_enabled.SetVisibility()
+			names_enabled.SetVisibility()
+		end
+		enabled_esp = state
+	end
+})	
+
+
+esp_box = playeresp:CreateToggle({
+	Name = "Bounding box",
+	State = false,
+	Callback = function(state)
+		box_esp = state
+		if enabled_esp == true and box_esp == true then	
+
+			for _, player in next, Players:GetPlayers() do
+				if player ~= LP then
+					createEsp(player)
+				end
+			end
+			
+			game.Players.PlayerAdded:Connect(function(player)
+				if player ~= LP then
+					createEsp(player)
+				end
+			end)
+
+			game.Players.PlayerRemoving:Connect(function(player)
+				removeEsp(player)
+			end)
+		else
+			for _, plr in pairs(game.Players:GetChildren()) do
+				if plr then
+					removeEsp(plr)
+					update_esp = false
+				end
+			end
+		end
+	end
+})	
+
+hpbar_enabled = playeresp:CreateToggle({
+	Name = "Health bar",
+	State = false,
+	Callback = function(state)
+		hpbar_esp = state
+	end
+})	
+local namesdrop
+local namesize
+
+names_enabled = playeresp:CreateToggle({
+	Name = "Name",
+	State = false,
+	Callback = function(state)
+		if namesdrop and namesize then
+			namesdrop.SetVisibility()
+			namesize.SetVisibility()
+		end
+		names = state
+	end
+})	
+
+namesdrop = playeresp:CreateDropdown({
+	Name = "Font",
+	State = 1,
+	Options = {"UI", "System","Plex","Mono"},
+	Callback = function(selectedOption)
+		if selectedOption == 1 then
+			name_font = 0
+		elseif selectedOption == 2 then
+			name_font = 1
+		elseif selectedOption == 3 then
+			name_font = 2
+		elseif selectedOption == 4 then
+			name_font = 3
+		end
+	end
+})
+
+namesize = playeresp:CreateSlider({Name = "Font size", State = 9, Max = 35, Min = 1, Decimals = 1, Suffix = "%",Callback= function(val)
+	fontsizevalue = val
+end})
+
+if esp_box and hpbar_enabled and names_enabled and namesdrop and namesize then
+	esp_box.SetVisibility()
+	hpbar_enabled.SetVisibility()
+	names_enabled.SetVisibility()
+	namesdrop.SetVisibility()
+	namesize.SetVisibility()
+end
+
+game["Run Service"]:BindToRenderStep("esp", Enum.RenderPriority.Camera.Value, function()
+	if box_esp == true and enabled_esp == true then
+		for player, drawings in next, espCache do
+			drawings.outerBox.Visible = false
+			drawings.box.Visible = false
+			drawings.line.Visible = false
+			drawings.text.Visible = false
+
+			if drawings and player then
+				updateEsp(player, drawings)
+			end
+		end
+	end
+end)
+
+local aa_jitter
+local aa_spin
+local aastyle
+
+local aaenabled = antiaim:CreateToggle({
+	Name = "Enabled",
+	State = false,
+	Callback = function(state)
+		if aa_jitter then
+			aa_jitter.SetVisibility()
+			aa_spin.SetVisibility()
+			aastyle.SetVisibility()
+		end
+		if state then
+			enabled_aa = true
+			if LP and LP.Character and LP.Character.Humanoid then
+				LP.Character.Humanoid.AutoRotate = false
+			end
+		else
+			enabled_aa = false
+			if LP and LP.Character and LP.Character.Humanoid then
+				LP.Character.Humanoid.AutoRotate = true
+			end
+		end
+	end
+})	
+
+aastyle = antiaim:CreateDropdown({
+	Name = "",
+	State = 1,
+	Options = {"AtTarget", "Jitter","Spin"},
+	Callback = function(selectedOption)
+		state_aa = selectedOption
+
+		if enabled_aa == true then
+			if LP and LP.Character and LP.Character.Humanoid then
+				LP.Character.Humanoid.AutoRotate = false
+			end
+			print(LP.Character.Humanoid.AutoRotate)
+		else
+			if LP and LP.Character and LP.Character.Humanoid then
+				LP.Character.Humanoid.AutoRotate = true
+			end
+		end
+	end
+})
+
+aa_jitter = antiaim:CreateSlider({Name = "Jitter modifier", State = 1, Max = 15, Min = 1, Decimals = 1, Suffix = "%",Callback= function(val)
+	jitterValue = "0."..val
+end})
+
+aa_spin = antiaim:CreateSlider({Name = "Spin modifier", State = 1, Max = 15, Min = 1, Decimals = 1, Suffix = "%",Callback= function(val)
+	spinValue = val
+end})
+
+
+if aa_jitter and aa_spin and aastyle then
+	aa_jitter.SetVisibility()
+	aa_spin.SetVisibility()
+	aastyle.SetVisibility()
+end
+
+local coroutine_aa = coroutine.create(function()
+	local player = game.Players.LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+	local function getDistance(part1, part2)
+		return (part1.Position - part2.Position).Magnitude
+	end
+
+	local function findClosestEntity()
+		local closestEntity = nil
+		local shortestDistance = math.huge
+
+		for _, object in pairs(workspace:GetChildren()) do
+			if object:IsA("Model") and object ~= character and object:FindFirstChild("HumanoidRootPart") then
+				local distance = getDistance(humanoidRootPart, object.HumanoidRootPart)
+				if distance < shortestDistance then
+					shortestDistance = distance
+					closestEntity = object.HumanoidRootPart
+				end
+			end
+		end
+
+		return closestEntity
+	end
+
+	local function lookAwayFrom(target)
+		if not target then return end
+
+		local directionToTarget = (target.Position - humanoidRootPart.Position).Unit
+		local horizontalDirection = Vector3.new(directionToTarget.X, 0, directionToTarget.Z).Unit
+
+		local oppositeDirection = -horizontalDirection
+
+		local currentPosition = humanoidRootPart.Position
+		humanoidRootPart.CFrame = CFrame.new(currentPosition, currentPosition + oppositeDirection)
+	end
+
+	local function lookAwayFromJitter(target)
+		if not target then return end
+
+		local directionToTarget = (target.Position - humanoidRootPart.Position).Unit
+		local horizontalDirection = Vector3.new(directionToTarget.X, 0, directionToTarget.Z).Unit
+
+		local oppositeDirection = -horizontalDirection
+
+		local jitter = Vector3.new(
+			math.random() * jitterValue - (jitterValue / 2), 
+			0, 
+			math.random() * jitterValue - (jitterValue / 2)
+		)
+
+		local finalDirection = (oppositeDirection + jitter).Unit
+
+		local currentPosition = humanoidRootPart.Position
+		humanoidRootPart.CFrame = CFrame.new(currentPosition, currentPosition + finalDirection)
+	end
+
+
+
+	game["Run Service"].RenderStepped:Connect(function()
+		task.wait()
+		if enabled_aa then
+			if state_aa == 1 then
+				local closestEntity = findClosestEntity()
+				lookAwayFrom(closestEntity)
+				if LP and LP.Character and LP.Character.Humanoid then
+					LP.Character.Humanoid.AutoRotate = false
+				end
+			elseif state_aa == 3 then
+				local characterCFrame = character.HumanoidRootPart.CFrame
+				character.HumanoidRootPart.CFrame = characterCFrame * CFrame.Angles(0, math.rad(spinValue), 0)
+				character.Humanoid.AutoRotate = false
+			elseif state_aa == 2 then
+				local closestEntity = findClosestEntity()
+				lookAwayFromJitter(closestEntity)
+				if LP and LP.Character and LP.Character.Humanoid then
+					LP.Character.Humanoid.AutoRotate = false
+				end
+			end
+		end
+	end)
+
+end)
+coroutine.resume(coroutine_aa)
+
+
+aimmodfunc = function(prikol, p49, p50, p_u_51, _, p52, p53, p54, p55)
+	
+	local v_u_6 = game.ReplicatedStorage.Remotes.VisualProjectile
+	local v_u_108 = 1
+	local v_u_106 = 0
+	local v_u_7 = game.ReplicatedStorage.Remotes.FireProjectile
+	local target = aimtarget
+	local target_part
+	local v_u_4 = require(game.ReplicatedStorage.Modules:WaitForChild("FunctionLibraryExtension"))
+	local v_u_15 = LP
+	local v_u_115 = v_u_4:GetEstimatedCameraPosition(v_u_15)
+	local v_u_103
+	local v_u_114
+	local v_u_16 = game.ReplicatedStorage.Players:FindFirstChild(v_u_15.Name)
+	local v_u_64 = v_u_16.Status.GameplayVariables:GetAttribute("EquipId")
+	local v_u_13 = game.ReplicatedStorage:WaitForChild("VFX")
+	local v_u_2 = require(game.ReplicatedStorage.Modules:WaitForChild("VFX"))
+	local v3 = require(game.ReplicatedStorage.Modules:WaitForChild("UniversalTables"))
+	local v_u_5 = game.ReplicatedStorage.Remotes.ProjectileInflict
+	local v_u_10 = game:GetService("ReplicatedStorage")
+	local v_u_12 = v_u_10:WaitForChild("RangedWeapons")
+	local v_u_17 = game.ReplicatedStorage.Temp
+	local v_u_56 = v_u_15.Character
+	local v135 = 500000
+	local v_u_18 = v3.ReturnTable("GlobalIgnoreListProjectile")
+	local v_u_115 = v_u_4:GetEstimatedCameraPosition(v_u_15)
+	local v65 = ReplicatedStorage.AmmoTypes:FindFirstChild(p53)
+	
+	local v_u_74 = v65:GetAttribute("Pellets")
+	local v60 = p50.ItemRoot
+	local v61 = p49.ItemProperties
+	local v62 = v_u_12:FindFirstChild(p49.Name)
+	local v63 = v61:FindFirstChild("SpecialProperties")
+	local v_u_66 = v63 and v63:GetAttribute("TracerColor") or v62:GetAttribute("ProjectileColor")
+	local itemprop = require(v_u_16.Inventory:FindFirstChild(p49.Name).SettingsModule)
+	local bulletspeed = v65:GetAttribute("MuzzleVelocity")
+	local armorpen4 = v65:GetAttribute("ArmorPen")
+	local tracerendpos = Vector3.zero
+	local v79 = {
+		["x"] = {
+			["Value"] = 0
+		},
+		["y"] = {
+			["Value"] = 0
+		}
+	}
+
+	if v_u_56:FindFirstChild(p49.Name) then
+		local v83 = 0.001 
+		local v82 = 0.001
+		local v81 = 10000
+		if v61.Tool:GetAttribute("MuzzleDevice") or "Default" == "Suppressor" then
+			if tick() - p53 < 0.8 then
+				v_u_4:PlaySoundV2(v60.FireSoundSupressed, v60.FireSoundSupressed.TimeLength, v_u_17)
+			else
+				v_u_4:PlaySoundV2(v60.FireSoundSupressed, v60.FireSoundSupressed.TimeLength, v_u_17)
+			end
+		elseif tick() - p54 < 0.8 then
+			v_u_4:PlaySoundV2(v60.FireSound, v60.FireSound.TimeLength, v_u_17)
+		else
+			v_u_4:PlaySoundV2(v60.FireSound, v60.FireSound.TimeLength, v_u_17)
+		end
+		local v_u_59
+		if p_u_51.Item.Attachments:FindFirstChild("Front") then
+			v_u_59 = p_u_51.Item.Attachments.Front:GetChildren()[1].Barrel
+			local _ = p50.Attachments.Front:GetChildren()[1].Barrel
+		else
+			v_u_59 = p_u_51.Item.Barrel
+			local _ = p50.Barrel
+		end
+
+		if target ~= nil and aimtargetpart ~= nil then
+			target_part = aimtargetpart
+			if aimtype == "Prediction" then
+				local buldrop = v65:GetAttribute("ProjectileDrop")
+				local bulsp = v65:GetAttribute("MuzzleVelocity")
+				target_part = predictpos(target_part, bulsp, buldrop)
+				v_u_103 = CFrame.new(v_u_115, target_part).LookVector
+			else
+				v_u_103 = CFrame.new(v_u_115, target_part.Position).LookVector
+			end
+			v_u_114 = v_u_103
+		else
+			target_part = p55
+			v_u_103 = CFrame.new(v_u_115, v_u_15:GetMouse().Hit.Position).LookVector
+			v_u_114 = v_u_103
+		end
+
+		function v185()
+			local v_u_110 = RaycastParams.new()
+			v_u_110.FilterType = Enum.RaycastFilterType.Exclude
+			local v_u_111 = { v_u_56, p_u_51, v_u_18, aimignoreparts}
+			v_u_110.FilterDescendantsInstances = v_u_111
+			v_u_110.CollisionGroup = "WeaponRay"
+			v_u_110.IgnoreWater = true
+
+			v_u_106 += 1
+
+			local usethisvec = v_u_114
+			if aimdebug1 then
+				usethisvec = Vector3.new(0,1,0)
+			end
+
+			if v_u_106 == 1 then
+				task.spawn(function()
+					for i=1, multitaps do
+						if aimtype == "Instant Hit" then
+							if not v_u_7:InvokeServer(usethisvec, v_u_108, tick()-15) then 
+								game.ReplicatedStorage.Modules.FPS.Binds.AdjustBullets:Fire(v_u_64, 1)
+							end
+						else
+							if not v_u_7:InvokeServer(usethisvec, v_u_108, tick()) then 
+								game.ReplicatedStorage.Modules.FPS.Binds.AdjustBullets:Fire(v_u_64, 1)
+							end
+						end
+					end
+				end)
+			elseif 1 < v_u_106 then
+				for i=1, multitaps do
+					v_u_6:FireServer(usethisvec, v_u_108)
+				end
+			end
+
+			local v_u_131 = nil
+			local v_u_132 = 0
+			local v_u_133 = 0
+
+			if (aimtype == "Prediction" or aimfakewait) and target ~= nil then
+				local tpart 
+				if target:IsA("Model") then
+					tpart = target.HumanoidRootPart
+				else
+					tpart = target.Character.HumanoidRootPart
+				end
+				local velocity = tpart.Velocity
+				local distance = (wcamera.CFrame.Position - tpart.CFrame.Position).Magnitude
+				local tth = (distance / bulletspeed)
+				task.wait(tth + 0.01)
+
+				if aimtarget ~= nil and aimtargetpart ~= nil then
+					target_part = aimtargetpart
+					if aimtype == "Prediction" then
+						local buldrop = v65:GetAttribute("ProjectileDrop")
+						local bulsp = v65:GetAttribute("MuzzleVelocity")
+						target_part = predictpos(target_part, bulsp, buldrop)
+						v_u_103 = CFrame.new(v_u_115, target_part).LookVector
+					else
+						v_u_103 = CFrame.new(v_u_115, target_part.Position).LookVector
+					end
+					v_u_114 = v_u_103
+				else
+					target_part = p55
+					v_u_103 = CFrame.new(v_u_115, v_u_15:GetMouse().Hit.Position).LookVector
+					v_u_114 = v_u_103
+				end
+			end
+
+			local penetrated = false
+
+			function v184(p134)
+				v_u_132 = v_u_132 + p134
+				if true then
+					v_u_133 = v_u_133 + v_u_132
+					local v136 = workspace:Raycast(v_u_115, v_u_114 * v135, v_u_110)
+					local v137 = nil
+					local v138 = nil
+					local v139 = nil
+					local v140
+					if v136 then
+						v137 = v136.Instance
+						v140 = v136.Position
+						v138 = v136.Normal
+						v139 = v136.Material
+					else
+						v140 = v_u_115 + v_u_114 * v135
+					end
+
+					if v137 == nil then
+						v_u_131:Disconnect()
+						return
+					end
+					print(Vector3.new(v140))
+					tracerendpos = v140
+					
+					local v171 = v_u_4:FindDeepAncestor(v137, "Model")
+					if v171:FindFirstChild("Humanoid") then -- if hit target
+						local ran = math.random(1, 100)
+						local ranbool = ran <= aimchance
+						
+						if game.Players.LocalPlayer then
+							local v175 = v137.CFrame:ToObjectSpace(CFrame.new(v140))
+
+							if target_part and penetrated == false then
+								v_u_5:FireServer(target_part, v175, v_u_108, tick())
+							else
+								v_u_5:FireServer(v137, v175, v_u_108, tick())
+							end
+						else
+							local v175 = v137.CFrame:ToObjectSpace(CFrame.new(v140))
+							v_u_5:FireServer(p55, v175, v_u_108, tick())
+						end
+
+						v_u_2.Impact(v137, v140, v138, v139, v_u_114, "Ranged", true)
+					elseif v137.Name == "Terrain" then -- if hit terrain
+						local v175 = v137.CFrame:ToObjectSpace(CFrame.new(v140))
+						v_u_5:FireServer(v137, v175, v_u_108, tick())
+
+						v_u_2.Impact(v137, v140, v138, v139, v_u_114, "Ranged", true)
+					else -- if hit not target then try wallpen
+						v_u_2.Impact(v137, v140, v138, v139, v_u_114, "Ranged", true)
+
+						local arg1, arg2, arg3 = v_u_4.Penetration(v_u_4, v137, v140, v_u_114, armorpen4)
+						if arg1 == nil or arg2 == nil then
+							local v175 = v137.CFrame:ToObjectSpace(CFrame.new(v140))
+							v_u_5:FireServer(v137, v175, v_u_108, tick())
+							v_u_131:Disconnect()
+							return
+						end
+
+						armorpen4 = arg1
+						if armorpen4 > 0 then
+							v_u_115 = arg2
+							v_u_2.Impact(unpack(arg3))
+							penetrated = true
+							return
+						end
+
+						v_u_131:Disconnect()
+						return
+					end
+				end
+
+				v_u_131:Disconnect()
+				return
+			end
+			v_u_131 = game:GetService("RunService").RenderStepped:Connect(v184)
+			return
+		end
+		if v_u_74 == nil then
+			task.spawn(v185)
+		else
+			for _ = 1, v_u_74 do
+				task.spawn(v185)
+			end
+		end
+
+		if tracbool then
+			task.spawn(function()
+				task.wait(0.05)
+				if tracerendpos == Vector3.zero then return end
+				runtracer(v60.Position, tracerendpos)
+				--print(tracerendpos.. " d")
+			end)
+		end
+
+		return v83, v82, v81, v79
+	end
+end
+
+local aimfovslider
+local aimbotFov
+local fovcoloraimbot
+
+local aimbot = rageSection:CreateToggle({
+	Name = "Enabled",
+	State = false,
+	Callback = function(state)
+		global_aimbot = state 
+		if aimbotFov then
+			aimbotFov.SetVisibility()
+		end
+		if global_aimbot == true then
+			require(game.ReplicatedStorage.Modules.FPS.Bullet).CreateBullet = aimmodfunc
+		else
+			require(game.ReplicatedStorage.Modules.FPS.Bullet).CreateBullet = aimogfunc
+		end
+		if state == false and aimbotFov  then
+			if aimbotFov:Get() then
+				aimbotFov:Set(false)
+			end
+		end
+	end
+})
+
+aimbotFov = rageSection:CreateToggle({
+	Name = "Aimbot FOV",
+	State = false,
+	Callback = function(state)
+		aimfovcircle.Visible = state
+		aimtargetshots.Visible = state
+		aimtargetname.Visible = state
+			if aimfovslider then
+				aimfovslider.SetVisibility()
+				fovcoloraimbot.SetVisibility()
+			end
+	end
+})
+
+
+fovcoloraimbot = rageSection:CreateColorpicker({
+	Name = "", 
+	State = Color3.fromRGB(0,4,255), 
+	Callback = function(selectedColor)
+		aimfovcircle.Color = selectedColor
+	end
+})
+
+aimfovslider = rageSection:CreateSlider({Name = "Radius", State = 250, Max = 1000, Min = 50, Decimals = 1, Suffix = "%",Callback= function(val)
+	aimfovcircle.Radius = val
+end})
+
+if aimfovslider and aimbotFov and fovcoloraimbot then
+	aimfovslider.SetVisibility()
+	aimbotFov.SetVisibility()
+	fovcoloraimbot.SetVisibility()
+end
+
+--local chance = rageSection:CreateSlider({Name = "Hit chance", State = 50, Max = 100, Min = 1, Decimals = 1, Suffix = "%"}) 
+
+
+
+local selfespEnabled = false
+local selfespcolor = Color3.fromRGB(0, 255, 255)
+local selfespmaterial = "ForceField"
+local selfesptrans = 0.5
+
+--[[
+local selfespmaterial = SelfEspContainer:CreateDropdown({
+	Name = "Material",
+	State = 1,
+	Options = {"ForceField", "SmoothPlastic", "Neon"},
+	Callback = function(selectedOption)
+		if selectedOption == 1 then
+			selfespmaterial = "ForceField"
+		elseif selectedOption == 2 then
+			selfespmaterial = "SmoothPlastic"
+		elseif selectedOption == 3 then
+			selfespmaterial = "Neon"
+		end
+	end
+})
+
+]]
+
+
+local exposure = false
+local exposure_value = 0
+local world_exp_sld
+
+local world_toggle = world_section:CreateToggle({
+	Name = "World exposure",
+	State = false,
+	Callback = function(state)
+		exposure = state
+		if state == false then
+			Lighting.ExposureCompensation = old_exp
+		else
+			Lighting.ExposureCompensation = exposure_value
+		end
+		if world_exp_sld then
+			world_exp_sld.SetVisibility()
+		end
+	end
+})
+
+world_exp_sld = world_section:CreateSlider({Name = "", State = 0, Max = 3, Min = -3, Decimals = 0.1, Suffix = "%",Callback= function(val)
+		exposure_value = val
+		Lighting.ExposureCompensation = val
+end})
+
+if world_exp_sld then
+	world_exp_sld.SetVisibility()
+end
+
+local world_sky_var = false
+local world_sky_str = "Rain"
+local world_skyList
+
+local world_sky = world_section:CreateToggle({
+	Name = "World sky",
+	State = false,
+	Callback = function(state)
+		world_sky_var = state
+		if world_skyList then
+			world_skyList.SetVisibility()
+		end
+		
+		if state == false then
+			local Sky1 = Lighting:FindFirstChildOfClass("Sky")
+			Sky1.Name = "Sky"
+			Sky1.StarCount = old_sky.StarCount
+			Sky1.MoonAngularSize = old_sky.MoonAngularSize
+			Sky1.CelestialBodiesShown = old_sky.CelestialBodiesShown
+			Sky1.SkyboxBk = old_sky.SkyboxBk
+			Sky1.SkyboxDn = old_sky.SkyboxDn
+			Sky1.SkyboxFt = old_sky.SkyboxFt
+			Sky1.SkyboxLf = old_sky.SkyboxLf
+			Sky1.SkyboxRt = old_sky.SkyboxRt
+			Sky1.SkyboxUp = old_sky.SkyboxUp
+		else
+			
+			local Sky0= Lighting:FindFirstChildOfClass("Sky")
+			if world_sky_str == 4 then
+				Sky0.Name = "Clear"
+				Sky0.StarCount = 3000
+				Sky0.MoonAngularSize = 11
+				Sky0.CelestialBodiesShown = true
+				Sky0.SkyboxBk = "rbxassetid://18586524369"
+				Sky0.SkyboxDn = "rbxassetid://18586494459"
+				Sky0.SkyboxFt = "rbxassetid://18586524369"
+				Sky0.SkyboxLf = "rbxassetid://18586524369"
+				Sky0.SkyboxRt = "rbxassetid://18586524369"
+				Sky0.SkyboxUp = "rbxassetid://18586494073"
+			elseif world_sky_str == 2 then
+				Sky0.Name = "Night"
+				Sky0.StarCount = 1000
+				Sky0.SkyboxBk = "http://www.roblox.com/asset/?id=11520735"
+				Sky0.SkyboxDn = "http://www.roblox.com/asset/?id=11520735"
+				Sky0.SkyboxFt = "http://www.roblox.com/asset/?id=11520735"
+				Sky0.SkyboxLf = "http://www.roblox.com/asset/?id=11520735"
+				Sky0.SkyboxRt = "http://www.roblox.com/asset/?id=11520735"
+				Sky0.SkyboxUp = "http://www.roblox.com/asset/?id=11520735"
+			elseif world_sky_str == 3 then
+				Sky0.Name = "Foggy"
+				Sky0.StarCount = 3000
+				Sky0.MoonAngularSize = 11
+				Sky0.CelestialBodiesShown = false
+				Sky0.SkyboxBk = "rbxassetid://449516810"
+				Sky0.SkyboxDn = "rbxassetid://449516862"
+				Sky0.SkyboxFt = "rbxassetid://449516810"
+				Sky0.SkyboxLf = "rbxassetid://449516810"
+				Sky0.SkyboxRt = "rbxassetid://449516810"
+				Sky0.SkyboxUp = "rbxassetid://449516657"
+			elseif world_sky_str == 1 then
+				Sky0.CelestialBodiesShown = true
+				Sky0.StarCount = 3000
+				Sky0.Name = "Rain"
+				Sky0.MoonAngularSize = 1
+				Sky0.MoonTextureId = ""
+				Sky0.SkyboxBk = "http://www.roblox.com/asset/?id=4495864450"
+				Sky0.SkyboxDn = "http://www.roblox.com/asset/?id=4495864887"
+				Sky0.SkyboxFt = "http://www.roblox.com/asset/?id=4495865458"
+				Sky0.SkyboxLf = "http://www.roblox.com/asset/?id=4495866035"
+				Sky0.SkyboxRt = "http://www.roblox.com/asset/?id=4495866584"
+				Sky0.SkyboxUp = "http://www.roblox.com/asset/?id=4495867486"
+			end
+		end
+	end
+})
+
+ world_skyList = world_section:CreateDropdown({
+	Name = "",
+	State = 1,
+	Options = {"Rain", "Night","Foggy","Clear"},
+	Callback = function(selectedOption)
+		if world_sky_var == true then
+			local Sky0= Lighting:FindFirstChildOfClass("Sky")
+			world_sky_str = selectedOption
+			if selectedOption == 4 then
+				Sky0.Name = "Clear"
+				Sky0.StarCount = 3000
+				Sky0.MoonAngularSize = 11
+				Sky0.CelestialBodiesShown = true
+				Sky0.SkyboxBk = "rbxassetid://18586524369"
+				Sky0.SkyboxDn = "rbxassetid://18586494459"
+				Sky0.SkyboxFt = "rbxassetid://18586524369"
+				Sky0.SkyboxLf = "rbxassetid://18586524369"
+				Sky0.SkyboxRt = "rbxassetid://18586524369"
+				Sky0.SkyboxUp = "rbxassetid://18586494073"
+			elseif selectedOption == 2 then
+				Sky0.Name = "Night"
+				Sky0.StarCount = 1000
+				Sky0.SkyboxBk = "http://www.roblox.com/asset/?id=11520735"
+				Sky0.SkyboxDn = "http://www.roblox.com/asset/?id=11520735"
+				Sky0.SkyboxFt = "http://www.roblox.com/asset/?id=11520735"
+				Sky0.SkyboxLf = "http://www.roblox.com/asset/?id=11520735"
+				Sky0.SkyboxRt = "http://www.roblox.com/asset/?id=11520735"
+				Sky0.SkyboxUp = "http://www.roblox.com/asset/?id=11520735"
+			elseif selectedOption == 3 then
+				Sky0.Name = "Foggy"
+				Sky0.StarCount = 3000
+				Sky0.MoonAngularSize = 11
+				Sky0.CelestialBodiesShown = false
+				Sky0.SkyboxBk = "rbxassetid://449516810"
+				Sky0.SkyboxDn = "rbxassetid://449516862"
+				Sky0.SkyboxFt = "rbxassetid://449516810"
+				Sky0.SkyboxLf = "rbxassetid://449516810"
+				Sky0.SkyboxRt = "rbxassetid://449516810"
+				Sky0.SkyboxUp = "rbxassetid://449516657"
+			elseif selectedOption == 1 then
+				Sky0.CelestialBodiesShown = true
+				Sky0.StarCount = 3000
+				Sky0.Name = "Rain"
+				Sky0.MoonAngularSize = 1
+				Sky0.MoonTextureId = ""
+				Sky0.SkyboxBk = "http://www.roblox.com/asset/?id=4495864450"
+				Sky0.SkyboxDn = "http://www.roblox.com/asset/?id=4495864887"
+				Sky0.SkyboxFt = "http://www.roblox.com/asset/?id=4495865458"
+				Sky0.SkyboxLf = "http://www.roblox.com/asset/?id=4495866035"
+				Sky0.SkyboxRt = "http://www.roblox.com/asset/?id=4495866584"
+				Sky0.SkyboxUp = "http://www.roblox.com/asset/?id=4495867486"
+			end
+		end
+	end
+})
+if world_skyList then
+	world_skyList.SetVisibility()
+end
+
+local mainswitch = effects:CreateToggle({
+	Name = "Enabled",
+	State = false,
+	Callback = function(state)
+		variables.ViewmodelEdit = state
+	end
+})	
+local  oldSurfaces = {}
+local TextViewmodel = effects:CreateToggle({
+	Name = "Textures",
+	State = false,
+	Callback = function(state)
+		variables.ViewmodelTextures = state
+		if state == false then
+			if game.Workspace.Camera:FindFirstChildOfClass("Model") then
+				local vm = game.Workspace.Camera:FindFirstChildOfClass("Model")
+				for _, sa in ipairs(vm:GetDescendants()) do
+					if sa:IsA("SurfaceAppearance") then
+						sa:Destroy()
+					end
+				end
+			end
+		else
+			if game.Workspace.Camera:FindFirstChildOfClass("Model") then
+				local vm = game.Workspace.Camera:FindFirstChildOfClass("Model")
+				for _, surfaceData in ipairs(oldSurfaces) do
+					local newSurface = Instance.new("SurfaceAppearance")
+					newSurface.TextureId = surfaceData.TextureId
+					newSurface.ColorId = surfaceData.ColorId
+					newSurface.Metalness = surfaceData.Metalness
+					newSurface.Roughness = surfaceData.Roughness
+					newSurface.Parent = vm:FindFirstChild(surfaceData.PartName) 
+				end
+			end
+		end
+	end
+})
+
+local new_time = old_time
+local enable_time = false
+local lighting_time
+local world_time = world_section:CreateToggle({Name = "World time", State = false, Callback = function(state)
+	enable_time = state
+	if lighting_time then
+		lighting_time.SetVisibility()
+	end
+	if enable_time== true and new_time~= nil then
+		Lighting.ClockTime = new_time
+	else
+		Lighting.ClockTime = old_time
+	end
+end})
+
+
+ lighting_time = world_section:CreateSlider({Name = "", State = 14, Max = 24, Min = 0, Decimals = 0.1, Suffix = "%",Callback= function(val)
+	if enable_time== true then
+		new_time = val
+		Lighting.ClockTime = new_time
+	end
+end})
+
+
+if lighting_time then
+	lighting_time.SetVisibility()
+end
+
+local shadows = world_section:CreateToggle({Name = "World shadows", State = true, Callback = function(state)
+	if state== true then
+		Lighting.GlobalShadows = true
+	else
+		Lighting.GlobalShadows = false
+	end
+end})
+
+
+local ambient_enabled = false
+local ambient_color
+local ambient = world_section:CreateToggle({Name = "World ambient", State = false, Callback = function(state)
+	if ambient_color then
+		ambient_color.SetVisibility()
+	end
+	if state then
+		ambient_enabled = true
+		
+		Lighting.Ambient = new_ambient
+	else
+		ambient_enabled = false
+		Lighting.Ambient = old_ambient
+	end
+end})
+
+
+ ambient_color = world_section:CreateColorpicker({
+	Name = "", 
+	State = Color3.fromRGB(255, 255, 255), 
+	Callback = function(selectedColor)
+		if ambient_enabled then
+			new_ambient = selectedColor
+			Lighting.Ambient = new_ambient
+		end
+	end
+})
+
+if ambient_color then
+	ambient_color.SetVisibility()
+end
+
+local CameraFov = player_section:CreateSlider({Name = "Camera FOV", State = 90, Max = 120, Min = 70, Decimals = 1, Suffix = "%",Callback= function(val)
+	if game.ReplicatedStorage.Players and game.ReplicatedStorage.Players:FindFirstChild(LP.Name) and game.ReplicatedStorage.Players:FindFirstChild(LP.Name).Settings then
+		local PlayerSettings = game.ReplicatedStorage.Players:FindFirstChild(LP.Name).Settings
+		PlayerSettings.GameplaySettings:SetAttribute("DefaultFOV", val)
+	end
+end})
+
+
+local ZoomSlider = player_section:CreateSlider({Name = "Gun FOV", State = 5, Max = 25, Min = 1, Decimals = 1, Suffix = "%",Callback= function(val)
+	num.GunZoom = val
+end})
+
+pcall(function()
+	if not_unloaded == true then
+		Lighting.Changed:Connect(function()
+			if exposure == true then
+				Lighting.ExposureCompensation = exposure_value
+			end
+			if enable_time == true then
+			Lighting.ClockTime = new_time
+			end
+			if ambient_enabled == true then
+			Lighting.Ambient = new_ambient
+			end
+			local atmos = Lighting:FindFirstChildOfClass("Atmosphere")
+			if atmos then
+				atmos:Destroy()
+			end
+		end)
+	end
+end)
+
+local function VisibleCheck(target)
+	local cameraPos = wcamera.CFrame.Position
+	local targetPos
+	if target ~= nil and target.Character ~= nil then
+		target = target.Character
+		if target:FindFirstChild("Head") then
+			local ignoreList = {}
+			for _, child in ipairs(target:GetChildren()) do
+				if child:IsA("Model") or child:IsA("Hat") or child:IsA("MeshPart") or child.Name == "HeadTopHitBox" or child.Name == "FaceHitBox" then
+					table.insert(ignoreList, child)
+				end
+			end
+			table.insert(ignoreList, game.Players.LocalPlayer.Character)
+			targetPos = target.Head.Position
+
+			local start = cameraPos
+			local goal = targetPos
+			local ray = Ray.new(start, (goal - start).unit * (goal - start).magnitude)
+			local hit = workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
+			if hit then
+				return false
+			else
+				return true
+			end
+		else
+			return false
+		end
+	else
+		return false
+	end
+end
+
+RunService.RenderStepped:Connect(function()
+	if global_aimbot == true then
+		local localplayer = LP
+		if not localplayer.Character or not localplayer.Character:FindFirstChild("HumanoidRootPart") or not localplayer.Character:FindFirstChild("Humanoid") then
+			return
+		end
+		
+		local nil1, nil2, newglobalcurrentgun = getcurrentgun(localplayer)
+		local globalcurrentgun = newglobalcurrentgun
+		globalammo = getcurrentammo(globalcurrentgun)
+
+		choosetarget()
+
+		if aimtarget ~= nil and aimtargetpart ~= nil then 
+			local check = VisibleCheck(aimtarget)
+			require(game.ReplicatedStorage.Modules.FPS.Bullet).CreateBullet = aimmodfunc
+			aimtargetname.Text = "victim: "..aimtarget.Name .. "\nhealth: "..aimtarget.Character.Humanoid.Health.."%\ndistance: ".. math.floor((localplayer.Character.HumanoidRootPart.Position - aimtargetpart.Position).Magnitude).."m\nvisible: "..tostring(check)
+			
+			Notify()
+			
+			local thum = aimtargetpart.Parent.Humanoid
+			local thealth = thum.Health
+			local shotsleft = nil
+			if globalammo ~= nil then
+				local gundmg = globalammo:GetAttribute("Damage")
+				shotsleft = math.floor(thealth / gundmg)
+			end
+
+		else
+			require(game.ReplicatedStorage.Modules.FPS.Bullet).CreateBullet = aimogfunc
+			aimtargetname.Text = "None"
+			aimtargetshots.Text = " "
+		end
+		aimtargetname.Position = Vector2.new(wcamera.ViewportSize.X / 2, wcamera.ViewportSize.Y / 2 + aimfov + 20)
+		aimtargetshots.Position = Vector2.new(wcamera.ViewportSize.X / 2, wcamera.ViewportSize.Y / 2 + aimfov + 50)
+		aimfovcircle.Position = Vector2.new(wcamera.ViewportSize.X / 2, wcamera.ViewportSize.Y / 2)
+	end
+	if not_unloaded == true then
+		if variables.ViewmodelEdit == true and wcamera:FindFirstChildOfClass("Model") then
+			if variables.ViewmodelTextures == true and wcamera:FindFirstChildOfClass("Model") then
+				local viewmodel = wcamera:FindFirstChildOfClass("Model")
+				
+			end
+		end
+		
+		if hitmarker == true then
+				for i,v in pairs(workspace.NoCollision.Effects:GetChildren()) do
+					if not v:FindFirstChild("hit") then
+						local hit = Instance.new("BillboardGui")
+						hit.Name = "hit"
+						hit.AlwaysOnTop = true
+
+						local hit_img = Instance.new("ImageLabel")
+						hit_img.Name = "hit_img"
+						hit_img.Image = hitmarkerTexture
+						hit_img.BackgroundTransparency = 1
+						hit_img.Size = UDim2.new(0, 50, 0, 50)
+						hit_img.Visible = true
+						hit_img.ImageColor3 = hitmarkerColor
+						hit_img.Rotation = 45
+						hit_img.AnchorPoint = Vector2.new(0.5, 0.5)
+
+						hit.Parent = v
+						hit_img.Parent = hit
+					end
+				end
+		end
+		
+			if PlayerInventory then
+				for i,v in PlayerInventory:GetDescendants() do
+					if v:FindFirstChild("ItemProperties") and GunList[v.Name] then
+						v.ItemProperties.Tool:SetAttribute("Zoom", num.GunZoom)
+						v.ItemProperties.Tool:SetAttribute("ZoomSpeed", -15)
+					end
+				end
+		end
+		if exposure == true then
+			Lighting.ExposureCompensation = exposure_value
+		end
+
+		if selfespEnabled then
+			for _, part in pairs(LP.Character:GetDescendants()) do
+				if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" and part.Name ~= "Head" then
+					if not originalColors[part.Name] then
+						originalColors[part.Name] = part.Color
+					end
+					part.Color = selfespcolor 
+					part.Material = Enum.Material[selfespmaterial] 
+					part.Transparency = selfesptrans
+				elseif part.Name == "Head" and part:IsA("BasePart") then
+					part.Transparency = 1  
+				elseif part:IsA("Decal") then
+					part.Transparency = 1 
+				end
+			end
+		else
+			for _, part in pairs(LP.Character:GetDescendants()) do
+				if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" and part.Name ~= "Head" then
+					if originalColors[part.Name] then
+						part.Color = originalColors[part.Name]
+					end
+					part.Material = Enum.Material.Plastic 
+					part.Transparency = 0
+				elseif part.Name == "Head" and part:IsA("BasePart") then
+					part.Transparency = 0  
+				elseif part:IsA("Decal") then
+					part.Transparency = 0  
+				end
+			end
+		end
+	end
+end)
