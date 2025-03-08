@@ -85,11 +85,15 @@ local function getCurrentTime()
 	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
 end
 
-function library:CreateTextLabel(...)
+function library:CreateTextLabel2(...)
+	
+	
+	
 	local arg = {...}
 	local arg1 = arg[1]
 	local arg2 = arg[2]
 	
+	do
 	local ScreenGui2 = utility:RenderObject("ScreenGui", {
 		DisplayOrder = 9999,
 		Enabled = true,
@@ -133,7 +137,17 @@ function library:CreateTextLabel(...)
 			textlabel:Destroy()
 		end)
 	end
+	
+	end
+	
 end
+
+function library:CreateSc()
+	do
+		
+	end
+end
+
 
 -- [[ // UI Functions // ]]
 function library:CreateWindow(Properties)
