@@ -85,7 +85,7 @@ local function getCurrentTime()
 	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
 end
 
-function library:CreateTextLabel()
+function library:CreateTextLabel(zv)
 	do
 		local ScreenGuiText = utility:RenderObject("ScreenGui", {
 			DisplayOrder = 9999,
@@ -95,6 +95,21 @@ function library:CreateTextLabel()
 			Parent = cre,
 			ResetOnSpawn = false,
 			ZIndexBehavior = "Global"
+		})
+		local TextLabel = utility:RenderObject("TextLabel", {
+			Font = Enum.Font.Gotham,
+			Text = zv,
+			TextColor3 = Color3.fromRGB(255, 255, 255),
+			TextScaled = true,
+			TextSize = library.TextSize,
+			TextWrapped = true,
+			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = ScreenGuiText,
+			AnchorPoint = Vector2.new(0.5,0.5),
+			Position = UDim2.new(0.5,0,0.5,0)
 		})
 		print(ScreenGuiText.Parent.Name)
 	end
