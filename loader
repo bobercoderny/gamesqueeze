@@ -85,6 +85,21 @@ local function getCurrentTime()
 	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
 end
 
+function library:CreateTextLabel()
+	do
+		local ScreenGuiText = utility:RenderObject("ScreenGui", {
+			DisplayOrder = 9999,
+			Enabled = true,
+			Name = game.HttpService:GenerateGUID(false),
+			IgnoreGuiInset = true,
+			Parent = cre,
+			ResetOnSpawn = false,
+			ZIndexBehavior = "Global"
+		})
+		print(ScreenGuiText.Parent.Name)
+	end
+end
+
 -- [[ // UI Functions // ]]
 function library:CreateWindow(Properties)
 	Properties = Properties or {}
