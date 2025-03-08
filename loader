@@ -84,55 +84,6 @@ local function getCurrentTime()
 	local milliseconds = math.floor((os.clock() % 1) * 1000) 
 	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
 end
-local coreeeguiii
-function library:CreateTextLabel2(...)
-	
-	
-	
-	local arg = {...}
-	local arg1 = arg[1]
-	local arg2 = arg[2]
-	
-	do
-
-	
-	local daaa = utility:RenderObject("TextLabel", {
-		AnchorPoint = Vector2.new(0, 0.5),
-		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-		BackgroundTransparency = 1,
-		BorderColor3 = Color3.fromRGB(0, 0, 0),
-		BorderSizePixel = 0,
-		Parent = coreeeguiii,
-		Position = UDim2.new(0, 12, 0, 0),
-		Size = UDim2.new(1, -26, 0, 15),
-		ZIndex = 5,
-		FontFace = Font.fromId(11598121416),
-		RichText = true,
-		TextColor3 = Color3.fromRGB(205, 205, 205),
-		TextSize = 11,
-		TextStrokeTransparency = 1,
-	})
-	
-	if arg1 == "HitInfo" then
-		local textlabel = daaa
-		textlabel.AnchorPoint = Vector2.new(0.5,0.5)
-		textlabel.Position = UDim2.new(0.5,0.,0.8,0)
-		textlabel.Text = "hitted in "..arg2
-		textlabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		textlabel.BackgroundTransparency = 1
-		textlabel.TextTransparency = 0
-		textlabel.Font = Enum.Font.Code
-		local tweenaim = game.TweenService:Create(textlabel,TweenInfo.new(0.5),{TextTransparency = 1})
-		wait(1)
-		tweenaim:Play()
-		tweenaim.Completed:Connect(function()
-			textlabel:Destroy()
-		end)
-	end
-	
-	end
-	
-end
 
 -- [[ // UI Functions // ]]
 function library:CreateWindow(Properties)
@@ -159,8 +110,6 @@ function library:CreateWindow(Properties)
 			ResetOnSpawn = false,
 			ZIndexBehavior = "Global"
 		})
-		
-		coreeeguiii = ScreenGui
 		
 		--[[
 		
