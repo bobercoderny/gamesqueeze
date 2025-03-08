@@ -85,37 +85,35 @@ local function getCurrentTime()
 	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
 end
 
-function library:CreateTextLabel(zv)
-	do
-		local ScreenGuiText = utility:RenderObject("ScreenGui", {
-			DisplayOrder = 9999,
-			Enabled = true,
-			Name = game.HttpService:GenerateGUID(false),
-			IgnoreGuiInset = true,
-			Parent = cre,
-			ResetOnSpawn = false,
-			ZIndexBehavior = "Global"
-		})
-		local TextLabel = utility:RenderObject("TextLabel", {
-			Font = Enum.Font.Gotham,
-			Text = zv,
-			TextColor3 = Color3.fromRGB(255, 255, 255),
-			TextScaled = true,
-			TextSize = library.TextSize,
-			TextWrapped = true,
-			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-			BackgroundTransparency = 1,
-			BorderColor3 = Color3.fromRGB(0, 0, 0),
-			BorderSizePixel = 0,
-			Size = Vector2.new(1,0,1,0),
-			Parent = ScreenGuiText,
-			AnchorPoint = Vector2.new(0.5,0.5),
-			Position = UDim2.new(0.5,0,0.5,0)
-		})
-		print(ScreenGuiText.Parent.Name)
-		print(TextLabel.Text)
-		print(TextLabel.Parent.Name)
-	end
+function library:CreateTextLabel()
+	local ScreenGui = utility:RenderObject("ScreenGui", {
+		DisplayOrder = 9999,
+		Enabled = true,
+		Name = game.HttpService:GenerateGUID(false),
+		IgnoreGuiInset = true,
+		Parent = cre,
+		ResetOnSpawn = false,
+		ZIndexBehavior = "Global"
+	})
+	local Section_Holder_Title = utility:RenderObject("TextLabel", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+		BackgroundTransparency = 1,
+		BorderColor3 = Color3.fromRGB(0, 0, 0),
+		BorderSizePixel = 0,
+		Parent = ScreenGui,
+		Position = UDim2.new(0.5,0,0.5,0),
+		Size = UDim2.new(0.1,0,0.3),
+		ZIndex = 5,
+		Font = Enum.Font.Code,
+		RichText = true,
+		Text = "Hit meowya_1337's head for 145!",
+		TextColor3 = Color3.fromRGB(255, 255, 255),
+		TextSize = 11,
+		TextTransparency = 0,
+		TextStrokeTransparency = 1,
+		TextXAlignment = "Center"
+	})
 end
 
 -- [[ // UI Functions // ]]
