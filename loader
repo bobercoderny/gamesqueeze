@@ -85,6 +85,38 @@ local function getCurrentTime()
 	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
 end
 
+function library:CreateTextLabel(...)
+	local arg = {...}
+	local arg1 = arg[1]
+	local arg2 = arg[2]
+	local ScreenGui2 = utility:RenderObject("ScreenGui", {
+		DisplayOrder = 9999,
+		Enabled = true,
+		Name = game.HttpService:GenerateGUID(false),
+		IgnoreGuiInset = true,
+		Parent = cre,
+		ResetOnSpawn = false,
+		ZIndexBehavior = "Global"
+	})
+	
+	if arg1 == "HitInfo" then
+		local textlabel = Instance.new("TextLabel",ScreenGui2)
+		textlabel.AnchorPoint = Vector2.new(0.5,0.5)
+		textlabel.Position = UDim2.new(0.5,0.,0.8,0)
+		textlabel.Text = "hitted in "..arg2
+		textlabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		textlabel.BackgroundTransparency = 1
+		textlabel.TextTransparency = 0
+		textlabel.Font = Enum.Font.Code
+		local tweenaim = game.TweenService:Create(textlabel,TweenInfo.new(0.5),{TextTransparency = 1})
+		wait(1)
+		tweenaim:Play()
+		tweenaim.Completed:Connect(function()
+			textlabel:Destroy()
+		end)
+	end
+end
+
 -- [[ // UI Functions // ]]
 function library:CreateWindow(Properties)
 	Properties = Properties or {}
