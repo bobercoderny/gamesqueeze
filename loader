@@ -84,7 +84,7 @@ local function getCurrentTime()
 	local milliseconds = math.floor((os.clock() % 1) * 1000) 
 	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
 end
-
+local coreeeguiii
 function library:CreateTextLabel2(...)
 	
 	
@@ -99,7 +99,7 @@ function library:CreateTextLabel2(...)
 		Enabled = true,
 		Name = game.HttpService:GenerateGUID(false),
 		IgnoreGuiInset = true,
-		Parent = cre,
+		Parent = coreeeguiii,
 		ResetOnSpawn = false,
 		ZIndexBehavior = "Global"
 	})
@@ -142,13 +142,6 @@ function library:CreateTextLabel2(...)
 	
 end
 
-function library:CreateSc()
-	do
-		
-	end
-end
-
-
 -- [[ // UI Functions // ]]
 function library:CreateWindow(Properties)
 	Properties = Properties or {}
@@ -174,6 +167,8 @@ function library:CreateWindow(Properties)
 			ResetOnSpawn = false,
 			ZIndexBehavior = "Global"
 		})
+		
+		coreeeguiii = ScreenGui.Parent
 		
 		--[[
 		
