@@ -84,6 +84,39 @@ local function getCurrentTime()
 	local milliseconds = math.floor((os.clock() % 1) * 1000) 
 	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
 end
+local daaaa
+function library:createHit(text,color)
+	task.spawn(function()
+		local Section_Holder_Title = utility:RenderObject("TextLabel", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = daaaa,
+			Position = UDim2.new(0.5,0,0.5,0),
+			Size = UDim2.new(1,0,0.1,0),
+			ZIndex = 5,
+			Font = Enum.Font.Code,
+			RichText = true,
+			Text = text,
+			TextColor3 = color,
+			Visible= true,
+			TextSize = 11,
+			TextTransparency = 0,
+			TextStrokeTransparency = 1,
+			TextXAlignment = "Center"
+		})
+
+		if Section_Holder_Title then
+			wait(5)
+			local tween = tws:Create(Section_Holder_Title, TweenInfo.new(0.5,Enum.EasingStyle.Sine), {TextTransparency = 1})
+			tween:Play()
+			tween.Completed:Wait()
+				Section_Holder_Title:Remove()
+		end
+	end)
+end
 
 function library:CreateTextLabel()
 	local ScreenGui = utility:RenderObject("ScreenGui", {
@@ -95,25 +128,25 @@ function library:CreateTextLabel()
 		ResetOnSpawn = false,
 		ZIndexBehavior = "Global"
 	})
-	local Section_Holder_Title = utility:RenderObject("TextLabel", {
-		AnchorPoint = Vector2.new(0.5, 0.5),
+	
+	local hits = utility:RenderObject("Frame", {
 		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
 		BackgroundTransparency = 1,
 		BorderColor3 = Color3.fromRGB(0, 0, 0),
 		BorderSizePixel = 0,
 		Parent = ScreenGui,
-		Position = UDim2.new(0.5,0,0.5,0),
-		Size = UDim2.new(0.1,0,0.3),
-		ZIndex = 5,
-		Font = Enum.Font.Code,
-		RichText = true,
-		Text = "Hit meowya_1337's head for 145!",
-		TextColor3 = Color3.fromRGB(255, 255, 255),
-		TextSize = 11,
-		TextTransparency = 0,
-		TextStrokeTransparency = 1,
-		TextXAlignment = "Center"
+		AnchorPoint = Vector2.new(0.5,0.5),
+		Position = UDim2.new(0.5, 0, 0.8, 0),
+		Size = UDim2.new(0.3, 0, 0.2, 0)
 	})
+	local uilist = utility:RenderObject("UIListLayout", {
+		Padding = UDim.new(0, 8),
+		Parent = hits,
+		FillDirection = "Vertical",
+		HorizontalAlignment = "Center",
+		VerticalAlignment = "Bottom"
+	})
+	daaaa = hits
 end
 
 -- [[ // UI Functions // ]]
@@ -1925,8 +1958,14 @@ do -- // Content
 					--
 					Serialised = Serialised == "" and "-" or Serialised
 					--
-					Outline_Frame_Title.Text = Serialised
-					Outline_Frame_Title2.Text = Serialised
+					if Content.Options[Content.State[1]] then
+					local Serialised2 = Content.Options[Content.State[1]].."..."
+						Outline_Frame_Title.Text = Serialised2
+						Outline_Frame_Title2.Text = Serialised2
+					else
+						Outline_Frame_Title.Text = "-"
+						Outline_Frame_Title2.Text = "-"
+					end
 					--
 					Content.Callback(Content:Get())
 					--
