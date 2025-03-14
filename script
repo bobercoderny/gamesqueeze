@@ -1,1 +1,3033 @@
-game.Lighting.Ambient = Color.fromRGB(255,0,4)
+-- gg/tVHvBYPDmf
+
+--[[
+
+EXAMPLES
+
+local toggle = section:CreateToggle({
+	Name = "Test",
+	State = false,
+	Callback = function(state)
+	end
+})
+
+local slider = section:CreateSlider({Name = "Test", State = 1, Max = 10, Min = 1, Decimals = 1, Suffix = "%",Callback= function(val)
+end})
+
+local colorpicker = section:CreateColorpicker({
+	Name = "Test", 
+	State = Color3.fromRGB(0,4,255), 
+	Callback = function(selectedColor)
+	end
+})
+
+local dropdown = section:CreateDropdown({
+	Name = "Test",
+	State = 1,
+	Options = {"ForceField", "SmoothPlastic", "Neon"},
+	Callback = function(selectedOption)
+	end
+})
+
+]]
+
+local library = {
+	Renders = {},
+	Connections = {},
+	Configs = "Configs",
+	TextSize = 11,
+}
+
+local utility = {}
+local pages = {}
+local sections = {}
+do
+	library.__index = library
+	pages.__index = pages
+	sections.__index = sections
+end
+-- [[ // Variables // ]] 
+local tws = game:GetService("TweenService")
+local uis = game:GetService("UserInputService")
+local cre
+
+if game:GetService("RunService"):IsStudio() then
+	cre =  game.Players.LocalPlayer.PlayerGui
+else
+	cre =  game.CoreGui
+end
+
+-- [[ // Functions // ]]
+function utility:RenderObject(RenderType, RenderProperties, RenderHidden)
+	local Render = Instance.new(RenderType)
+	--
+	if RenderProperties and typeof(RenderProperties) == "table" then
+		for Property, Value in pairs(RenderProperties) do
+			if Property ~= "RenderTime" then
+				Render[Property] = Value
+			end
+		end
+	end
+	--
+	library.Renders[#library.Renders + 1] = {Render, RenderProperties, RenderHidden, RenderProperties["RenderTime"] or nil}
+	--
+	return Render
+end
+--
+function utility:CreateConnection(ConnectionType, ConnectionCallback)
+	local Connection = ConnectionType:Connect(ConnectionCallback)
+	--
+	library.Connections[#library.Connections + 1] = Connection
+	--
+	return Connection
+end
+--
+function utility:MouseLocation()
+	return uis:GetMouseLocation()
+end
+--
+function utility:Serialise(Table)
+	local Serialised = ""
+	--
+	for Index, Value in pairs(Table) do
+		Serialised = Serialised .. Value .. ", "
+	end
+	--
+	return Serialised:sub(0, #Serialised - 2)
+end
+--
+function utility:Sort(Table1, Table2)
+	local Table3 = {}
+	--
+	for Index, Value in pairs(Table2) do
+		if table.find(Table1, Index) then
+			Table3[#Table3 + 1] = Value
+		end
+	end
+	--
+	return Table3
+end
+
+local function getCurrentTime()
+	local currentTime = os.date("*t") 
+	local hours = string.format("%02d", currentTime.hour) 
+	local minutes = string.format("%02d", currentTime.min) 
+	local seconds = string.format("%02d", currentTime.sec) 
+	local milliseconds = math.floor((os.clock() % 1) * 1000) 
+	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
+end
+local daaaa
+function library:createHit(text,color)
+	task.spawn(function()
+		local Section_Holder_Title = utility:RenderObject("TextLabel", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = daaaa,
+			Position = UDim2.new(0.5,0,0.5,0),
+			Size = UDim2.new(1,0,0.1,0),
+			ZIndex = 5,
+			Font = Enum.Font.Code,
+			RichText = true,
+			Text = text,
+			TextColor3 = color,
+			Visible= true,
+			TextSize = 11,
+			TextTransparency = 0,
+			TextStrokeTransparency = 1,
+			TextXAlignment = "Center"
+		})
+
+		if Section_Holder_Title then
+			wait(5)
+			local tween = tws:Create(Section_Holder_Title, TweenInfo.new(0.5,Enum.EasingStyle.Sine), {TextTransparency = 1})
+			tween:Play()
+			tween.Completed:Wait()
+				Section_Holder_Title:Remove()
+		end
+	end)
+end
+
+function library:CreateTextLabel()
+	local ScreenGui = utility:RenderObject("ScreenGui", {
+		DisplayOrder = 9999,
+		Enabled = true,
+		Name = game.HttpService:GenerateGUID(false),
+		IgnoreGuiInset = true,
+		Parent = cre,
+		ResetOnSpawn = false,
+		ZIndexBehavior = "Global"
+	})
+	
+	local hits = utility:RenderObject("Frame", {
+		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+		BackgroundTransparency = 1,
+		BorderColor3 = Color3.fromRGB(0, 0, 0),
+		BorderSizePixel = 0,
+		Parent = ScreenGui,
+		AnchorPoint = Vector2.new(0.5,0.5),
+		Position = UDim2.new(0.5, 0, 0.8, 0),
+		Size = UDim2.new(0.3, 0, 0.2, 0)
+	})
+	local uilist = utility:RenderObject("UIListLayout", {
+		Padding = UDim.new(0, 8),
+		Parent = hits,
+		FillDirection = "Vertical",
+		HorizontalAlignment = "Center",
+		VerticalAlignment = "Bottom"
+	})
+	daaaa = hits
+end
+
+-- [[ // UI Functions // ]]
+function library:CreateWindow(Properties)
+	Properties = Properties or {}
+	--
+	local Window = {
+		Pages = {},
+		Accent = Color3.fromRGB(255, 88, 91),
+		Enabled = true,
+		MenuResize = false,
+		Key = Enum.KeyCode.RightShift, -- key
+	}
+	
+	--
+	do
+		local playerTime = getCurrentTime()
+		print("library loaded ".. playerTime)
+		local ScreenGui = utility:RenderObject("ScreenGui", {
+			DisplayOrder = 9999,
+			Enabled = true,
+			Name = game.HttpService:GenerateGUID(false),
+			IgnoreGuiInset = true,
+			Parent = cre,
+			ResetOnSpawn = false,
+			ZIndexBehavior = "Global"
+		})
+		
+		--[[
+		
+		local Background = utility:RenderObject("ImageLabel", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(12, 12, 12),
+			BorderMode = "Inset",
+			BorderSizePixel = 1,
+			Parent = ScreenGui,
+			Image = "rbxassetid://16771469449",
+			ZIndex= -1,
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = UDim2.new(1,0,1,0),
+			Name = game.HttpService:GenerateGUID(false),
+		})
+		
+		
+		]]
+		local CanvasGGroup = utility:RenderObject("CanvasGroup", {
+			AnchorPoint = Vector2.new(0,0),
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 0.5,
+			BorderColor3 = Color3.fromRGB(12, 12, 12),
+			BorderMode = "Inset",
+			BorderSizePixel = 0,
+			Parent = ScreenGui,
+			Size = UDim2.new(1,0,1,0),
+			Name = game.HttpService:GenerateGUID(false),
+		})
+		local UiScale = Instance.new("UIScale",ScreenGui)
+		UiScale.Scale= 1	
+		local ScreenGui_MainFrame = utility:RenderObject("Frame", {
+			AnchorPoint = Vector2.new(0,0),
+			BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(12, 12, 12),
+			BorderMode = "Inset",
+			BorderSizePixel = 1,
+			Parent = CanvasGGroup,
+			Size = UDim2.new(0, 630, 0, 770),
+			Name = game.HttpService:GenerateGUID(false),
+		})
+		local parentSize = ScreenGui_MainFrame.Size
+		local parentWidth = parentSize.X.Offset
+		local parentHeight = parentSize.Y.Offset
+		
+		local mySize = ScreenGui_MainFrame.Size
+		local myWidth = mySize.X.Offset
+		local myHeight = mySize.Y.Offset
+		
+		ScreenGui_MainFrame.Position = UDim2.new(0, (parentWidth - myWidth) / 2, 0, (parentHeight - myHeight) / 2)
+		
+		local candrag = true
+		
+		local player = game.Players.LocalPlayer
+
+		local frame = ScreenGui_MainFrame
+
+		local dragging = false
+		local dragStart = nil
+		local startPos = nil
+
+		local function updateFramePosition(input)
+			local delta = input.Position - dragStart
+			frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+
+			local screenSize = workspace.CurrentCamera.ViewportSize
+			local frameSize = frame.Size
+
+			local newPos = frame.Position
+
+			if newPos.X.Offset < 0 then
+				newPos = UDim2.new(0, 0, newPos.Y.Scale, newPos.Y.Offset)
+			elseif newPos.X.Offset + frameSize.X.Offset > screenSize.X then
+				newPos = UDim2.new(1, -frameSize.X.Offset, newPos.Y.Scale, newPos.Y.Offset)
+			end
+
+			if newPos.Y.Offset < 0 then
+				newPos = UDim2.new(newPos.X.Scale, newPos.X.Offset, 0, 0)
+			elseif newPos.Y.Offset + frameSize.Y.Offset > screenSize.Y then
+				newPos = UDim2.new(newPos.X.Scale, newPos.X.Offset, 1, -frameSize.Y.Offset)
+			end
+
+			frame.Position = newPos
+		end
+
+		frame.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 then
+				dragging = true
+				dragStart = input.Position
+				startPos = frame.Position
+
+				input.Changed:Connect(function()
+					if input.UserInputState == Enum.UserInputState.End then
+						dragging = false
+					end
+				end)
+			end
+		end)
+
+		frame.InputChanged:Connect(function(input)
+			if dragging and input.UserInputType == Enum.UserInputType.MouseMovement and candrag then
+				updateFramePosition(input)
+			end
+		end)
+
+
+			
+		local ScreenGui_MainFrame_InnerBorder = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = ScreenGui_MainFrame,
+			Position = UDim2.new(0, 1, 0, 1),
+			Size = UDim2.new(1, -2, 1, -2),
+			Name = game.HttpService:GenerateGUID(false),
+		})
+
+		local MainFrame_InnerBorder_InnerFrame = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(60, 60, 60),
+			BorderMode = "Inset",
+			BorderSizePixel = 1,
+			Parent = ScreenGui_MainFrame,
+			Position = UDim2.new(0, 3, 0, 3),
+			Size = UDim2.new(1, -6, 1, -6),
+			Name = game.HttpService:GenerateGUID(false),
+		})
+		local ResizeButton = utility:RenderObject("TextButton", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			ZIndex = 999,
+			AnchorPoint = Vector2.new(1,1),
+			Position = UDim2.new(1,15,1,15),
+			Parent = MainFrame_InnerBorder_InnerFrame,
+			Size = UDim2.new(0.1, 15, 0.1, 15),
+			Text = ""
+		}) 
+		
+		local function resize()
+			local button = ResizeButton
+			local main = ScreenGui_MainFrame
+
+			local player = game.Players.LocalPlayer
+			local mouse = player:GetMouse()
+
+			local function checkSize()
+				local x = math.max(main.Size.X.Offset, 660)
+				local y = math.max(main.Size.Y.Offset, 560)
+				main.Size = UDim2.fromOffset(x, y)
+			end
+
+			local resizeConnection : RBXScriptConnection
+			local inputConnection : RBXScriptConnection
+
+			local function inputEnded(input : InputObject)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Focus then
+					inputConnection:Disconnect(); inputConnection = nil
+					resizeConnection:Disconnect(); resizeConnection = nil
+					checkSize()
+				end
+			end
+
+			local function connectInputFunction()
+				inputConnection = game.UserInputService.InputEnded:Connect(inputEnded)
+			end
+
+			button.MouseButton1Down:Connect(function()
+				if Window.MenuResize == true then
+				local lastPos = Vector2.new(mouse.X, mouse.Y)
+				resizeConnection = mouse.Move:Connect(function()
+					local new = Vector2.new(mouse.X, mouse.Y)
+					local delta = new - lastPos
+					lastPos = new
+					main.Size += UDim2.fromOffset(delta.X, delta.Y)
+					checkSize()
+				end)
+					connectInputFunction()
+				end
+			end)
+		end
+		
+		resize()
+		
+		local InnerBorder_InnerFrame_Tabs = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = MainFrame_InnerBorder_InnerFrame,
+			Position = UDim2.new(0, 0, 0, 4),
+			Size = UDim2.new(1, 0, 0, 69),
+			Name = "ontop",
+		})
+
+		local InnerBorder_InnerFrame_Pages = utility:RenderObject("Frame", {
+			AnchorPoint = Vector2.new(1, 0),
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = MainFrame_InnerBorder_InnerFrame,
+			Position = UDim2.new(1, 0, 0, 74),
+			Size = UDim2.new(1, 0, 1, -74),
+			Name = "test",
+		})
+
+		local InnerBorder_InnerFrame_TopGradient = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = MainFrame_InnerBorder_InnerFrame,
+			Position = UDim2.new(0, 0, 0, 0),
+			Size = UDim2.new(1, 0, 0, 4),
+			Name = game.HttpService:GenerateGUID(false),
+		})
+
+		local InnerFrame_Tabs_List = utility:RenderObject("UIListLayout", {
+			Padding = UDim.new(0, 4),
+			Parent = InnerBorder_InnerFrame_Tabs,
+			FillDirection = "Horizontal",
+			HorizontalAlignment = "Center",
+			VerticalAlignment = "Top",
+			Name= "test",
+		})
+
+		local InnerFrame_Tabs_Padding = utility:RenderObject("UIPadding", {
+			Parent = InnerBorder_InnerFrame_Tabs,
+			PaddingTop = UDim.new(0, 9),
+		})
+
+		local InnerFrame_Pages_InnerBorder = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(45, 45, 45),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = InnerBorder_InnerFrame_Pages,
+			Position = UDim2.new(0, 0, 0, 0),
+			Size = UDim2.new(1, 0, 1, 0),
+			Name = "test",
+		})
+		local InnerFrame_TopGradient_Gradient = utility:RenderObject("Frame", {
+			BackgroundColor3 = Window.Accent,
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = InnerBorder_InnerFrame_TopGradient,
+			Position = UDim2.new(0, 1, 0, 1),
+			Size = UDim2.new(1, -2, 1, -2),
+			Name = game.HttpService:GenerateGUID(false),
+		})
+		
+		local InnerFrame_TopGradient_Gradient2 = utility:RenderObject("ImageLabel", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			AnchorPoint= Vector2.new(0.5,0.5),
+			Parent = InnerFrame_TopGradient_Gradient,
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = UDim2.new(1,0,3,0),
+			Image = "rbxassetid://135021825022643",--1316045217 gradik
+			ImageColor3 = Window.Accent,
+			ImageTransparency = 0.6,
+			ZIndex= 2,
+			Name = "priv",
+		})
+		
+		local Pages_InnerBorder_InnerFrame = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = InnerFrame_Pages_InnerBorder,
+			Position = UDim2.new(0, 0, 0, 0),
+			Size = UDim2.new(1, 0, 1, 0),
+			Name = game.HttpService:GenerateGUID(false),
+		})
+
+		local InnerBorder_InnerFrame_Folder = utility:RenderObject("Folder", {
+			Parent = Pages_InnerBorder_InnerFrame,
+			Name = game.HttpService:GenerateGUID(false),
+		})
+
+		
+		local Resize = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+			BackgroundTransparency = 1,
+			ZIndex= 2,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			AnchorPoint = Vector2.new(1,1),
+			Parent = ScreenGui_MainFrame,
+			Position = UDim2.new(1,0,1,0),
+			Size = UDim2.new(0,100,0,100),
+			Name = game.HttpService:GenerateGUID(false),
+		})
+		-----
+		
+		-----
+		--
+		do -- // Functions
+			function Window:SetPage(Page)
+				for index, page in pairs(Window.Pages) do
+					if page.Open and page ~= Page then
+						page:Set(false)
+					end
+				end
+			end
+			--
+			
+			--
+			function Window:Unload()
+				ScreenGui:Remove()
+				--
+				for index, connection in pairs(library.Connections) do
+					connection:Disconnect()
+				end
+				--
+				library = nil
+				utility = nil
+			end
+		end
+		--
+		do -- // Index Setting
+			Window["TabsHolder"] = InnerBorder_InnerFrame_Tabs
+			Window["PagesHolder"] = InnerBorder_InnerFrame_Folder
+		end
+		--
+		do -- // Connections
+			utility:CreateConnection(uis.InputBegan, function(Input)
+
+				if Input.KeyCode and Input.KeyCode == Window.Key or Input.KeyCode == Enum.KeyCode.Insert then
+
+					Window.Enabled = not Window.Enabled
+					ResizeButton.Modal = Window.Enabled
+					candrag = Window.Enabled
+					CanvasGGroup.Parent.Enabled = Window.Enabled
+				end
+			end)
+		end
+	end
+	--
+	return setmetatable(Window, library)
+end
+--
+function library:CreatePage(Properties)
+	Properties = Properties or {}
+	--
+	local Page = {
+		Image = (Properties.image or Properties.Image or Properties.icon or Properties.Icon),
+		Image2 = (Properties.image or Properties.Image or Properties.glow or Properties.Glow),
+		Size = (Properties.size or Properties.Size or UDim2.new(0, 55, 0, 55)),
+		Open = false,
+		Window = self
+	}
+	--
+	do
+		local Page_Tab = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Page.Window["TabsHolder"],
+			Size = UDim2.new(0, 72, 1, 0)
+		})
+		-- //
+		local Page_Tab_Border = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Page_Tab,
+			Size = UDim2.new(1, 0, 1, 0),
+			Visible = false,
+			ZIndex = 2,
+			RenderTime = 0.15
+		})
+		--
+		local Page_Tab_Image = utility:RenderObject("ImageLabel", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Page_Tab,
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = Page.Size,
+			ZIndex = 2,
+			Image = Page.Image,
+			ImageColor3 = Color3.fromRGB(220, 220, 220)
+		})
+		local Page_Tab_ImageGlow = utility:RenderObject("ImageLabel", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Page_Tab_Image,
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = Page.Size,
+			ZIndex = 1,
+			Name= game.HttpService:GenerateGUID(false),
+			ImageTransparency = 0.5,
+			Image = Page.Image2,
+			ImageColor3 = Color3.fromRGB(220, 220, 220)
+		})
+		if Page_Tab_ImageGlow.Image== "rbxassetid://127240918083300" then
+			Page_Tab_ImageGlow.Size = UDim2.new(0,60,0,60)
+			Page_Tab_Image.Size = UDim2.new(0,60,0,60)
+		end
+		--
+		local Page_Tab_Button = utility:RenderObject("TextButton", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Page_Tab,
+			Size = UDim2.new(1, 0, 1, 0),
+			Text = ""
+			
+		})
+		-- //
+		
+		-- //
+		
+		--
+		
+		-- //
+		local Page_Page = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Page.Window["PagesHolder"],
+			Position = UDim2.new(0, 20, 0, 20),
+			Size = UDim2.new(1, -40, 1, -40),
+			Visible = false
+		})
+		-- //
+		local Page_Page_Left = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Page_Page,
+			Position = UDim2.new(0, 0, 0, 0),
+			Size = UDim2.new(0.5, -10, 1, 0)
+		})
+		--
+		local Page_Page_Right = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Page_Page,
+			Position = UDim2.new(0.5, 10, 0, 0),
+			Size = UDim2.new(0.5, -10, 1, 0)
+		})
+		-- //
+		local Page_Left_List = utility:RenderObject("UIListLayout", {
+			Padding = UDim.new(0, 18),
+			Parent = Page_Page_Left,
+			FillDirection = "Vertical",
+			HorizontalAlignment = "Left",
+			VerticalAlignment = "Top"
+		})
+		--
+		local Page_Right_List = utility:RenderObject("UIListLayout", {
+			Padding = UDim.new(0, 18),
+			Parent = Page_Page_Right,
+			FillDirection = "Vertical",
+			HorizontalAlignment = "Left",
+			VerticalAlignment = "Top"
+		})
+		--
+		do -- // Index Setting
+			Page["Page"] = Page_Page
+			Page["Left"] = Page_Page_Left
+			Page["Right"] = Page_Page_Right
+		end
+		--
+		do -- // Functions
+			function Page:Set(state)
+				Page.Open = state
+				--
+				Page_Page.Visible = Page.Open
+				Page_Tab_Border.Visible = Page.Open
+				
+				Page_Tab_Image.ImageColor3 = Page.Open and Color3.fromRGB(255, 88, 91) or Color3.fromRGB(220, 220, 220)
+				Page_Tab_ImageGlow.ImageColor3 = Page.Open and Color3.fromRGB(255, 88, 91) or Color3.fromRGB(220, 220, 220)
+				--
+				if Page.Open then
+					Page.Window:SetPage(Page)
+				end
+				
+			end
+		end
+		--
+		do -- // Connections
+			utility:CreateConnection(Page_Tab_Button.MouseButton1Click, function(Input)
+				if not Page.Open then
+					Page:Set(true)
+				end
+			end)
+			--
+			utility:CreateConnection(Page_Tab_Button.MouseEnter, function(Input)
+				Page_Tab_Image.ImageColor3 = Color3.fromRGB(255, 88, 91)
+				Page_Tab_ImageGlow.ImageColor3 = Color3.fromRGB(255, 88, 91)
+			end)
+			--
+			utility:CreateConnection(Page_Tab_Button.MouseLeave, function(Input)
+				Page_Tab_Image.ImageColor3 = Page.Open and Color3.fromRGB(255, 88, 91) or Color3.fromRGB(220, 220, 220)
+				Page_Tab_ImageGlow.ImageColor3 = Page.Open and Color3.fromRGB(255, 88, 91) or Color3.fromRGB(220, 220, 220)
+			end)
+		end
+	end
+	--
+	if #Page.Window.Pages == 0 then Page:Set(true) end
+	Page.Window.Pages[#Page.Window.Pages + 1] = Page
+	return setmetatable(Page, pages)
+end
+--
+function pages:CreateSection(Properties)
+	Properties = Properties or {}
+	--
+	local Section = {
+		Name = (Properties.name or Properties.Name or Properties.title or Properties.Title or "New Section"),
+		Size = (Properties.size or Properties.Size or 150),
+		Side = (Properties.side or Properties.Side or "Left"),
+		Content = {},
+		Window = self.Window,
+		Page = self
+	}
+	--
+	do
+		local scaledSize 
+		local Section_Holder
+		
+		local function offsetToScale(frame)
+			local parentSize = frame.Parent.Size
+			local offsetSize = frame.Size
+			
+			local parentWidth = parentSize.X.Scale * frame.Parent.AbsoluteSize.X + parentSize.X.Offset
+			local parentHeight = parentSize.Y.Scale * frame.Parent.AbsoluteSize.Y + parentSize.Y.Offset
+
+			local scaleX = offsetSize.X.Offset / parentWidth
+			local scaleY = offsetSize.Y.Offset / parentHeight
+			
+			frame.Size = UDim2.new(1, 0, scaleY, 0)
+		end
+		
+		
+		 Section_Holder = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(12, 12, 12),
+			BorderMode = "Inset",
+			BorderSizePixel = 1,
+			Parent = Section.Page[Section.Side],
+			Size = UDim2.new(1, 0, 0, Section.Size),
+			ZIndex = 2
+		})
+		
+		
+		offsetToScale(Section_Holder)
+		-- //
+		local Section_Holder_Extra = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Section_Holder,
+			Position = UDim2.new(0, 1, 0, 1),
+			Size = UDim2.new(1, -2, 1, -2),
+			ZIndex = 2
+		})
+		--
+		local Section_Holder_Frame = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(23, 23, 23),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Section_Holder,
+			Position = UDim2.new(0, 1, 0, 1),
+			Size = UDim2.new(1, -2, 1, -2),
+			ZIndex = 2
+		})
+		--
+		local Section_Holder_TitleInline = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(23, 23, 23),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Section_Holder,
+			Position = UDim2.new(0, 9, 0, -1),
+			Size = UDim2.new(0, 0, 0, 2),
+			ZIndex = 5
+		})
+		--
+		local Section_Holder_Title = utility:RenderObject("TextLabel", {
+			AnchorPoint = Vector2.new(0, 0.5),
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Section_Holder,
+			Position = UDim2.new(0, 12, 0, 0),
+			Size = UDim2.new(1, -26, 0, 15),
+			ZIndex = 5,
+			FontFace = Font.fromId(11598121416),
+			RichText = true,
+			Text = "<b>" .. Section.Name .. "</b>",
+			TextColor3 = Color3.fromRGB(205, 205, 205),
+			TextSize = 11,
+			TextStrokeTransparency = 1,
+			TextXAlignment = "Left"
+		})
+		-- //
+		local Holder_Extra_Gradient1 = utility:RenderObject("ImageLabel", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Section_Holder_Extra,
+			Position = UDim2.new(0, 1, 0, 1),
+			Rotation = 180,
+			Size = UDim2.new(1, -2, 0, 20),
+			Visible = false,
+			ZIndex = 4,
+			Image = "rbxassetid://7783533907",
+			ImageColor3 = Color3.fromRGB(23, 23, 23)
+		})
+		--
+		local Holder_Extra_Gradient2 = utility:RenderObject("ImageLabel", {
+			AnchorPoint = Vector2.new(0, 1),
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Section_Holder_Extra,
+			Position = UDim2.new(0, 0, 1, 0),
+			Size = UDim2.new(1, -2, 0, 20),
+			Visible = false,
+			ZIndex = 4,
+			Image = "rbxassetid://7783533907",
+			ImageColor3 = Color3.fromRGB(23, 23, 23)
+		})
+		--
+		local Holder_Extra_ArrowUp = utility:RenderObject("TextButton", {
+			BackgroundColor3 = Color3.fromRGB(255, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Section_Holder_Extra,
+			Position = UDim2.new(1, -21, 0, 0),
+			Size = UDim2.new(0, 7 + 8, 0, 6 + 8),
+			Text = "",
+			Visible = false,
+			ZIndex = 4
+		})
+		--
+		local Holder_Extra_ArrowDown = utility:RenderObject("TextButton", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Section_Holder_Extra,
+			Position = UDim2.new(1, -21, 1, -(6 + 8)),
+			Size = UDim2.new(0, 7 + 8, 0, 6 + 8),
+			Text = "",
+			Visible = false,
+			ZIndex = 4
+		})
+		-- //
+		local Extra_ArrowUp_Image = utility:RenderObject("ImageLabel", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Holder_Extra_ArrowUp,
+			Position = UDim2.new(0, 4, 0, 4),
+			Size = UDim2.new(0, 7, 0, 6),
+			Visible = true,
+			ZIndex = 4,
+			Image = "rbxassetid://8548757311",
+			ImageColor3 = Color3.fromRGB(205, 205, 205)
+		})
+		--
+		local Extra_ArrowDown_Image = utility:RenderObject("ImageLabel", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Holder_Extra_ArrowDown,
+			Position = UDim2.new(0, 4, 0, 4),
+			Size = UDim2.new(0, 7, 0, 6),
+			Visible = true,
+			ZIndex = 4,
+			Image = "rbxassetid://8548723563",
+			ImageColor3 = Color3.fromRGB(205, 205, 205)
+		})
+		--
+		local Holder_Extra_Bar = utility:RenderObject("Frame", {
+			AnchorPoint = Vector2.new(1, 0),
+			BackgroundColor3 = Color3.fromRGB(45, 45, 45),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Section_Holder_Extra,
+			Position = UDim2.new(1, 0, 0, 0),
+			Size = UDim2.new(0, 6, 1, 0),
+			Visible = false,
+			ZIndex = 4
+		})
+		--
+		local Holder_Extra_Line = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(45, 45, 45),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Section_Holder_Extra,
+			Position = UDim2.new(0, 0, 0, -1),
+			Size = UDim2.new(1, 0, 0, 1),
+			ZIndex = 4
+		})
+		--
+		local Holder_Frame_ContentHolder = utility:RenderObject("ScrollingFrame", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = Section_Holder_Frame,
+			Position = UDim2.new(0, 0, 0, 0),
+			Size = UDim2.new(1, 0, 1, 0),
+			ZIndex = 4,
+			AutomaticCanvasSize = "Y",
+			BottomImage = "rbxassetid://7783554086",
+			CanvasSize = UDim2.new(0, 0, 0, 0),
+			MidImage = "rbxassetid://7783554086",
+			ScrollBarImageColor3 = Color3.fromRGB(65, 65, 65),
+			ScrollBarImageTransparency = 0,
+			ScrollBarThickness = 5,
+			TopImage = "rbxassetid://7783554086",
+			VerticalScrollBarInset = "None"
+		})
+		-- //
+		local Frame_ContentHolder_List = utility:RenderObject("UIListLayout", {
+			Padding = UDim.new(0, 0),
+			Parent = Holder_Frame_ContentHolder,
+			FillDirection = "Vertical",
+			HorizontalAlignment = "Center",
+			VerticalAlignment = "Top"
+		})
+		--
+		local Frame_ContentHolder_Padding = utility:RenderObject("UIPadding", {
+			Parent = Holder_Frame_ContentHolder,
+			PaddingTop = UDim.new(0, 15),
+			PaddingBottom = UDim.new(0, 15)
+		})
+		--
+		do -- // Section Init
+			Section_Holder_TitleInline.Size = UDim2.new(0, Section_Holder_Title.TextBounds.X + 6, 0, 2)
+		end
+		--
+		do -- // Index Setting
+			Section["Holder"] = Holder_Frame_ContentHolder
+			Section["Extra"] = Section_Holder_Extra
+		end
+		--
+		do -- // Functions
+			function Section:CloseContent()
+				if Section.Content.Open  then
+					Section.Content:Close()
+					--
+					Section.Content = {}
+				end
+			end
+		end
+		--
+		do -- // Connections
+			utility:CreateConnection(Holder_Frame_ContentHolder:GetPropertyChangedSignal("AbsoluteCanvasSize"), function()
+				Holder_Extra_Gradient1.Visible = Holder_Frame_ContentHolder.AbsoluteCanvasSize.Y > Holder_Frame_ContentHolder.AbsoluteWindowSize.Y
+				Holder_Extra_Gradient2.Visible = Holder_Frame_ContentHolder.AbsoluteCanvasSize.Y > Holder_Frame_ContentHolder.AbsoluteWindowSize.Y
+				Holder_Extra_Bar.Visible = Holder_Frame_ContentHolder.AbsoluteCanvasSize.Y > Holder_Frame_ContentHolder.AbsoluteWindowSize.Y
+				--
+				if (Holder_Frame_ContentHolder.AbsoluteCanvasSize.Y > Holder_Frame_ContentHolder.AbsoluteWindowSize.Y) then
+					Holder_Extra_ArrowUp.Visible = (Holder_Frame_ContentHolder.CanvasPosition.Y > 5)
+					Holder_Extra_ArrowDown.Visible = (Holder_Frame_ContentHolder.CanvasPosition.Y + 5 < (Holder_Frame_ContentHolder.AbsoluteCanvasSize.Y - Holder_Frame_ContentHolder.AbsoluteSize.Y))
+				end
+			end)
+			--
+			utility:CreateConnection(Holder_Frame_ContentHolder:GetPropertyChangedSignal("CanvasPosition"), function()
+				if Section.Content.Open then
+					Section.Content:Close()
+					--
+					Section.Content = {}
+				end
+				--
+				Holder_Extra_ArrowUp.Visible = (Holder_Frame_ContentHolder.CanvasPosition.Y > 1)
+				Holder_Extra_ArrowDown.Visible = (Holder_Frame_ContentHolder.CanvasPosition.Y + 1 < (Holder_Frame_ContentHolder.AbsoluteCanvasSize.Y - Holder_Frame_ContentHolder.AbsoluteSize.Y))
+			end)
+			--
+			utility:CreateConnection(Holder_Extra_ArrowUp.MouseButton1Click, function()
+				Holder_Frame_ContentHolder.CanvasPosition = Vector2.new(0, math.clamp(Holder_Frame_ContentHolder.CanvasPosition.Y - 10, 0, Holder_Frame_ContentHolder.AbsoluteCanvasSize.Y - Holder_Frame_ContentHolder.AbsoluteSize.Y))
+			end)
+			--
+			utility:CreateConnection(Holder_Extra_ArrowDown.MouseButton1Click, function()
+				Holder_Frame_ContentHolder.CanvasPosition = Vector2.new(0, math.clamp(Holder_Frame_ContentHolder.CanvasPosition.Y + 10, 0, Holder_Frame_ContentHolder.AbsoluteCanvasSize.Y - Holder_Frame_ContentHolder.AbsoluteSize.Y))
+			end)
+		end
+	end
+	--
+	return setmetatable(Section, sections)
+end
+--
+do -- // Content
+	function sections:CreateToggle(Properties)
+		Properties = Properties or {}
+		--
+		local Content = {
+			Name = (Properties.name or Properties.Name or Properties.title or Properties.Title or "New Toggle"),
+			State = (Properties.state or Properties.State or Properties.def or Properties.Def or Properties.default or Properties.Default or false),
+			Callback = (Properties.callback or Properties.Callback or Properties.callBack or Properties.CallBack or function() end),
+			Window = self.Window,
+			Page = self.Page,
+			Section = self
+		}
+		--
+		do
+			local Content_Holder = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content.Section.Holder,
+				Size = UDim2.new(1, 0, 0, 8 + 10),
+				ZIndex = 3
+			})
+			-- //
+			local Content_Holder_Outline = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 20, 0, 5),
+				Size = UDim2.new(0, 8, 0, 8),
+				ZIndex = 3
+			})
+			--
+			local Content_Holder_Title = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 0),
+				Size = UDim2.new(1, -41, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = Content.Name,
+				TextColor3 = Color3.fromRGB(205, 205, 205),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextXAlignment = "Left"
+			})
+			--
+			local Content_Holder_Title2 = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 0),
+				Size = UDim2.new(1, -41, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = Content.Name,
+				TextColor3 = Color3.fromRGB(205, 205, 205),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextTransparency = 0.5,
+				TextXAlignment = "Left"
+			})
+			--
+			local Content_Holder_Button = utility:RenderObject("TextButton", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = ""
+			})
+			-- //
+			local Holder_Outline_Frame = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(77, 77, 77),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder_Outline,
+				Position = UDim2.new(0, 1, 0, 1),
+				Size = UDim2.new(1, -2, 1, -2),
+				ZIndex = 3
+			})
+			local graddd = utility:RenderObject("ImageLabel", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				AnchorPoint= Vector2.new(0.5,0.5),
+				Parent = Holder_Outline_Frame,
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				Size = UDim2.new(7, 0, 8, 0),
+				Image = "rbxassetid://135021825022643",--1316045217 gradik
+				ImageColor3 = Color3.fromRGB(77, 77, 77),
+				ImageTransparency = 0.6,
+				ZIndex= 2,
+				Name = game.HttpService:GenerateGUID(false),
+			})
+			-- //
+			local Outline_Frame_Gradient = utility:RenderObject("UIGradient", {
+				Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(140, 140, 140)),
+				Enabled = true,
+				Rotation = 90,
+				Parent = Holder_Outline_Frame
+			})
+			game["Run Service"].RenderStepped:Connect(function()
+				task.wait()
+				Holder_Outline_Frame.BackgroundColor3 = Content.State and Content.Window.Accent or Color3.fromRGB(77, 77, 77)
+				graddd.ImageColor3 = Content.State and Content.Window.Accent or Color3.fromRGB(77, 77, 77)
+			end)
+			--
+			do -- // Functions
+				function Content:SetVisibility()
+					Content_Holder.Visible = not Content_Holder.Visible
+				end
+				
+				function Content:Set(state)
+					Content.State = state
+					--
+					Holder_Outline_Frame.BackgroundColor3 = Content.State and Content.Window.Accent or Color3.fromRGB(77, 77, 77)
+					graddd.Visible = state
+					graddd.ImageColor3 = Content.State and Content.Window.Accent or Color3.fromRGB(77, 77, 77)
+					--
+					Content.Callback(Content:Get())
+				end
+				--
+				function Content:Get()
+					return Content.State
+				end
+			end
+			--
+			do -- // Connections
+				utility:CreateConnection(Content_Holder_Button.MouseButton1Click, function(Input)
+					Content:Set(not Content:Get())
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseEnter, function(Input)
+					Outline_Frame_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(180, 180, 180))
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseLeave, function(Input)
+					Outline_Frame_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(140, 140, 140))
+				end)
+			end
+			--
+			Content:Set(Content.State)
+		end
+		--
+		return Content
+	end
+	--
+	function sections:CreateSlider(Properties)
+		Properties = Properties or {}
+		--
+		local Content = {
+			Name = (Properties.name or Properties.Name or Properties.title or Properties.Title or nil),
+			State = (Properties.state or Properties.State or Properties.def or Properties.Def or Properties.default or Properties.Default or false),
+			Min = (Properties.min or Properties.Min or Properties.minimum or Properties.Minimum or 0),
+			Max = (Properties.max or Properties.Max or Properties.maxmimum or Properties.Maximum or 100),
+			Ending = (Properties.ending or Properties.Ending or Properties.suffix or Properties.Suffix or ""),
+			Decimals = (1 / (Properties.decimals or Properties.Decimals or Properties.tick or Properties.Tick or 1)),
+			Callback = (Properties.callback or Properties.Callback or Properties.callBack or Properties.CallBack or function() end),
+			Holding = false,
+			Window = self.Window,
+			Page = self.Page,
+			Section = self
+		}
+		--
+		do
+			local Content_Holder = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content.Section.Holder,
+				Size = UDim2.new(1, 0, 0, (Content.Name and 24 or 13) + 5),
+				ZIndex = 3
+			})
+			-- //
+			local Content_Holder_Outline = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 40, 0, Content.Name and 18 or 5),
+				Size = UDim2.new(1, -99, 0, 7),
+				ZIndex = 3
+			})
+			if Content.Name== "" or Content.Name== " " then
+				Content_Holder_Outline.Position= UDim2.new(0,40, 0, 3) 
+				Content_Holder.Size= UDim2.new(1, 0,0,16)
+			else
+				Content_Holder_Outline.Position= UDim2.new(0, 40, 0, 18) 
+			end
+			--
+			if Content.Name then
+				local Content_Holder_Title = utility:RenderObject("TextLabel", {
+					AnchorPoint = Vector2.new(0, 0),
+					BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+					BackgroundTransparency = 1,
+					BorderColor3 = Color3.fromRGB(0, 0, 0),
+					BorderSizePixel = 0,
+					Parent = Content_Holder,
+					Position = UDim2.new(0, 41, 0, 4),
+					Size = UDim2.new(1, -41, 0, 10),
+					ZIndex = 3,
+					FontFace = Font.fromId(11598121416),
+					RichText = true,
+					Text = Content.Name,
+					TextColor3 = Color3.fromRGB(205, 205, 205),
+					TextSize = library.TextSize,
+					TextStrokeTransparency = 1,
+					TextXAlignment = "Left"
+				})
+				--
+				local Content_Holder_Title2 = utility:RenderObject("TextLabel", {
+					AnchorPoint = Vector2.new(0, 0),
+					BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+					BackgroundTransparency = 1,
+					BorderColor3 = Color3.fromRGB(0, 0, 0),
+					BorderSizePixel = 0,
+					Parent = Content_Holder,
+					Position = UDim2.new(0, 41, 0, 4),
+					Size = UDim2.new(1, -41, 0, 10),
+					ZIndex = 3,
+					FontFace = Font.fromId(11598121416),
+					RichText = true,
+					Text = Content.Name,
+					TextColor3 = Color3.fromRGB(205, 205, 205),
+					TextSize = library.TextSize,
+					TextStrokeTransparency = 1,
+					TextTransparency = 0.5,
+					TextXAlignment = "Left"
+				})
+			end
+			--
+			local Content_Holder_Button = utility:RenderObject("TextButton", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = ""
+			})
+			-- //
+			local Holder_Outline_Frame = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(71, 71, 71),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder_Outline,
+				Position = UDim2.new(0, 1, 0, 1),
+				Size = UDim2.new(1, -2, 1, -2),
+				ZIndex = 3
+			})
+			-- //
+			local Outline_Frame_Slider = utility:RenderObject("Frame", {
+				BackgroundColor3 = Content.Window.Accent,
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Holder_Outline_Frame,
+				Position = UDim2.new(0, 0, 0, 0),
+				Size = UDim2.new(0, 0, 1, 0),
+				ZIndex = 3
+			})
+			local graddd = utility:RenderObject("ImageLabel", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				AnchorPoint= Vector2.new(0.5,0.5),
+				Parent = Outline_Frame_Slider,
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				Size = UDim2.new(4, 0, 10, 0),
+				Image = "rbxassetid://135021825022643",--1316045217 gradik
+				ImageColor3 = Content.Window.Accent,
+				ImageTransparency = 0.3,
+				ZIndex= 3,
+				Name = "slider",
+			})
+			--
+			local Outline_Frame_Gradient = utility:RenderObject("UIGradient", {
+				Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(175, 175, 175)),
+				Enabled = true,
+				Rotation = 270,
+				Parent = Holder_Outline_Frame
+			})
+			-- //
+			local Frame_Slider_Gradient = utility:RenderObject("UIGradient", {
+				Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(175, 175, 175)),
+				Enabled = true,
+				Rotation = 90,
+				Parent = Outline_Frame_Slider
+			})
+			game["Run Service"].RenderStepped:Connect(function()
+				task.wait()
+				Outline_Frame_Slider.BackgroundColor3 = Content.Window.Accent
+			end)
+			-- //
+			local Frame_Slider_Title = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0.5, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Outline_Frame_Slider,
+				Position = UDim2.new(1, 0, 0.5, 1),
+				Size = UDim2.new(0, 2, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = "",
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextSize = 11,
+				TextStrokeTransparency = 0.5,
+				TextXAlignment = "Center",
+				RenderTime = 0.15
+			})
+			--
+			local Frame_Slider_Title2 = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0.5, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Outline_Frame_Slider,
+				Position = UDim2.new(1, 0, 0.5, 1),
+				Size = UDim2.new(0, 2, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = "",
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextSize = 11,
+				TextStrokeTransparency = 0.5,
+				TextTransparency = 0,
+				TextXAlignment = "Center",
+				RenderTime = 0.15
+			})
+			--
+			do -- // Functions
+				
+				function Content:SetVisibility()
+					Content_Holder.Visible = not Content_Holder.Visible
+				end
+				
+				function Content:Set(state)
+					Content.State = math.clamp(math.round(state * Content.Decimals) / Content.Decimals, Content.Min, Content.Max)
+					--
+					Frame_Slider_Title.Text = "<b>" .. Content.State .. Content.Ending .. "</b>"
+					Outline_Frame_Slider.Size = UDim2.new((1 - ((Content.Max - Content.State) / (Content.Max - Content.Min))), 0, 1, 0)
+					--
+					Content.Callback(Content:Get())
+				end
+				--
+				function Content:Refresh()
+					local Mouse = utility:MouseLocation()
+					--
+					Outline_Frame_Slider.BackgroundColor3= Content.Window.Accent
+					
+					Content:Set(math.clamp(math.floor((Content.Min + (Content.Max - Content.Min) * math.clamp(Mouse.X - Outline_Frame_Slider.AbsolutePosition.X, 0, Holder_Outline_Frame.AbsoluteSize.X) / Holder_Outline_Frame.AbsoluteSize.X) * Content.Decimals) / Content.Decimals, Content.Min, Content.Max))
+				end
+				--
+				function Content:Get()
+					return Content.State
+				end
+			end
+			--
+			do -- // Connections
+				utility:CreateConnection(Content_Holder_Button.MouseButton1Down, function(Input)
+					Content:Refresh()
+					--
+					Content.Holding = true
+					--
+					Outline_Frame_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(215, 215, 215))
+					Frame_Slider_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(215, 215, 215))
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseEnter, function(Input)
+					Outline_Frame_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(215, 215, 215))
+					Frame_Slider_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(215, 215, 215))
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseLeave, function(Input)
+					Outline_Frame_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Content.Holding and Color3.fromRGB(215, 215, 215) or Color3.fromRGB(175, 175, 175))
+					Frame_Slider_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Content.Holding and Color3.fromRGB(215, 215, 215) or Color3.fromRGB(175, 175, 175))
+				end)
+				--
+				utility:CreateConnection(uis.InputChanged, function(Input)
+					if Content.Holding then
+						Content:Refresh()
+					end
+				end)
+				--
+				utility:CreateConnection(uis.InputEnded, function(Input)
+					if Content.Holding and Input.UserInputType == Enum.UserInputType.MouseButton1 then
+						Content.Holding = false
+						--
+						Outline_Frame_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(175, 175, 175))
+						Frame_Slider_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(175, 175, 175))
+					end
+				end)
+			end
+			--
+			Content:Set(Content.State)
+		end
+		--
+		return Content
+	end
+	--
+	function sections:CreateDropdown(Properties)
+		Properties = Properties or {}
+		--
+		local Content = {
+			Name = (Properties.name or Properties.Name or Properties.title or Properties.Title or "New Dropdown"),
+			State = (Properties.state or Properties.State or Properties.def or Properties.Def or Properties.default or Properties.Default or 1),
+			Options = (Properties.options or Properties.Options or Properties.list or Properties.List or {1, 2, 3}),
+			Callback = (Properties.callback or Properties.Callback or Properties.callBack or Properties.CallBack or function() end),
+			Content = {
+				Open = false
+			},
+			Window = self.Window,
+			Page = self.Page,
+			Section = self
+		}
+		--
+		do
+			local Content_Holder = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content.Section.Holder,
+				Size = UDim2.new(1, 0, 0, 34 + 5),
+				ZIndex = 3
+			})
+			-- //
+			
+			local Content_Holder_Outline = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 40, 0, 15),
+				Size = UDim2.new(1, -98, 0, 20),
+				ZIndex = 3
+			})
+			if Content.Name== "" or Content.Name== " " then
+				Content_Holder_Outline.Position= UDim2.new(0, 40, 0, 0) 
+				Content_Holder.Size = UDim2.new(1,0,0,25)
+			else
+				Content_Holder_Outline.Position= UDim2.new(0, 40, 0, 15) 
+				Content_Holder.Size = UDim2.new(1,0,0,39)
+			end
+			
+			--
+			local Content_Holder_Title = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 4),
+				Size = UDim2.new(1, -41, 0, 10),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = Content.Name,
+				TextColor3 = Color3.fromRGB(205, 205, 205),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextXAlignment = "Left"
+			})
+			--
+			local Content_Holder_Title2 = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 4),
+				Size = UDim2.new(1, -41, 0, 10),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = Content.Name,
+				TextColor3 = Color3.fromRGB(205, 205, 205),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextTransparency = 0.5,
+				TextXAlignment = "Left"
+			})
+			--
+			local Content_Holder_Button = utility:RenderObject("TextButton", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = ""
+			})
+			-- //
+			local Holder_Outline_Frame = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(36, 36, 36),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder_Outline,
+				Position = UDim2.new(0, 1, 0, 1),
+				Size = UDim2.new(1, -2, 1, -2),
+				ZIndex = 3
+			})
+			-- //
+			local Outline_Frame_Gradient = utility:RenderObject("UIGradient", {
+				Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(220, 220, 220)),
+				Enabled = true,
+				Rotation = 270,
+				Parent = Holder_Outline_Frame
+			})
+			--
+			local Outline_Frame_Title = utility:RenderObject("TextLabel", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Holder_Outline_Frame,
+				Position = UDim2.new(0, 8, 0, 0),
+				Size = UDim2.new(1, 0, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = "",
+				TextColor3 = Color3.fromRGB(155, 155, 155),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextXAlignment = "Left"
+			})
+			--
+			local Outline_Frame_Title2 = utility:RenderObject("TextLabel", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Holder_Outline_Frame,
+				Position = UDim2.new(0, 8, 0, 0),
+				Size = UDim2.new(1, 0, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = "",
+				TextColor3 = Color3.fromRGB(155, 155, 155),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextTransparency = 0,
+				TextXAlignment = "Left"
+			})
+			--
+			local Outline_Frame_Arrow = utility:RenderObject("ImageLabel", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Holder_Outline_Frame,
+				Position = UDim2.new(1, -11, 0.5, -4),
+				Size = UDim2.new(0, 7, 0, 6),
+				Image = "rbxassetid://8532000591",
+				ImageColor3 = Color3.fromRGB(255, 255, 255),
+				ZIndex = 3
+			})
+			--
+			do -- // Functions
+				
+				function Content:SetVisibility()
+					Content_Holder.Visible = not Content_Holder.Visible
+				end
+				function Content:Set(state)
+					Content.State = state
+					--
+					Outline_Frame_Title.Text = Content.Options[Content:Get()]
+					Outline_Frame_Title2.Text = Content.Options[Content:Get()]
+					--
+					Content.Callback(Content:Get())
+					--
+					if Content.Content.Open then
+						Content.Content:Refresh(Content:Get())
+					end
+				end
+				--
+				function Content:Get()
+					return Content.State
+				end
+				--
+				function Content:Open()
+					Content.Section:CloseContent()
+					--
+					local Open = {}
+					local Connections = {}
+					--
+					local InputCheck
+					--
+					local Content_Open_Holder = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+						BackgroundTransparency = 1,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 0,
+						Parent = Content.Section.Extra,
+						Position = UDim2.new(0, Content_Holder_Outline.AbsolutePosition.X - Content.Section.Extra.AbsolutePosition.X, 0, Content_Holder_Outline.AbsolutePosition.Y - Content.Section.Extra.AbsolutePosition.Y + 21),
+						Size = UDim2.new(1, -98, 0, (18 * #Content.Options) + 2),
+						ZIndex = 6
+					})
+					-- //
+					local Open_Holder_Outline = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+						BackgroundTransparency = 0,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 0,
+						Parent = Content_Open_Holder,
+						Position = UDim2.new(0, 0, 0, 0),
+						Size = UDim2.new(1, 0, 1, 0),
+						ZIndex = 6
+					})
+					-- //
+					local Open_Holder_Outline_Frame = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+						BackgroundTransparency = 0,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 0,
+						Parent = Open_Holder_Outline,
+						Position = UDim2.new(0, 1, 0, 1),
+						Size = UDim2.new(1, -2, 1, -2),
+						ZIndex = 6
+					})
+					-- //
+					for Index, Option in pairs(Content.Options) do
+						local Outline_Frame_Option = utility:RenderObject("Frame", {
+							BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+							BackgroundTransparency = 0,
+							BorderColor3 = Color3.fromRGB(0, 0, 0),
+							BorderSizePixel = 0,
+							Parent = Open_Holder_Outline_Frame,
+							Position = UDim2.new(0, 0, 0, 18 * (Index - 1)),
+							Size = UDim2.new(1, 0, 1 / #Content.Options, 0),
+							ZIndex = 6
+						})
+						
+						-- //
+						local Frame_Option_Title = utility:RenderObject("TextLabel", {
+							BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+							BackgroundTransparency = 1,
+							BorderColor3 = Color3.fromRGB(0, 0, 0),
+							BorderSizePixel = 0,
+							Parent = Outline_Frame_Option,
+							Position = UDim2.new(0, 8, 0, 0),
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 6,
+							FontFace = Font.fromId(11598121416),
+							RichText = true,
+							Text = tostring(Option),
+							TextColor3 = Index == Content.State and Content.Window.Accent or Color3.fromRGB(205, 205, 205),
+							TextSize = library.TextSize,
+							TextStrokeTransparency = 1,
+							TextXAlignment = "Left"
+						})
+						--
+						local Frame_Option_Title2 = utility:RenderObject("TextLabel", {
+							BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+							BackgroundTransparency = 1,
+							BorderColor3 = Color3.fromRGB(0, 0, 0),
+							BorderSizePixel = 0,
+							Parent = Outline_Frame_Option,
+							Position = UDim2.new(0, 8, 0, 0),
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 6,
+							FontFace = Font.fromId(11598121416),
+							RichText = true,
+							Text = tostring(Option),
+							TextColor3 = Index == Content.State and Content.Window.Accent or Color3.fromRGB(205, 205, 205),
+							TextSize = library.TextSize,
+							TextStrokeTransparency = 1,
+							TextTransparency = 0.5,
+							TextXAlignment = "Left"
+						})
+						--
+						local Frame_Option_Button = utility:RenderObject("TextButton", {
+							BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+							BackgroundTransparency = 1,
+							BorderColor3 = Color3.fromRGB(0, 0, 0),
+							BorderSizePixel = 0,
+							Parent = Outline_Frame_Option,
+							Size = UDim2.new(1, 0, 1, 0),
+							Text = "",
+							ZIndex = 6
+						})
+						game["Run Service"].RenderStepped:Connect(function()
+							task.wait()
+							Frame_Option_Title2.TextColor3 = Index == Content.State and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
+							Frame_Option_Title.TextColor3 = Index == Content.State and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
+						end)
+						--
+						do -- // Connections
+							local Clicked = utility:CreateConnection(Frame_Option_Button.MouseButton1Click, function(Input)
+								Content:Set(Index)
+							end)
+							--
+							local Entered = utility:CreateConnection(Frame_Option_Button.MouseEnter, function(Input)
+								Outline_Frame_Option.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+							end)
+							--
+							local Left = utility:CreateConnection(Frame_Option_Button.MouseLeave, function(Input)
+								Outline_Frame_Option.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+							end)
+							--
+							Connections[#Connections + 1] = Clicked
+							Connections[#Connections + 1] = Entered
+							Connections[#Connections + 1] = Left
+						end
+						--
+						Open[#Open + 1] = {Index, Frame_Option_Title, Frame_Option_Title2, Outline_Frame_Option, Frame_Option_Button}
+					end
+					--
+					do -- // Functions
+						
+						function Content.Content:Close()
+							Content.Content.Open = false
+							--
+							Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(36, 36, 36)
+							--
+							for Index, Value in pairs(Connections) do
+								Value:Disconnect()
+							end
+							--
+							InputCheck:Disconnect()
+							--
+							for Index, Value in pairs(Open) do
+								Value[2]:Remove()
+								Value[3]:Remove()
+								Value[4]:Remove()
+								Value[5]:Remove()
+							end
+							--
+							Content_Open_Holder:Remove()
+							Open_Holder_Outline:Remove()
+							Open_Holder_Outline_Frame:Remove()
+							--
+							function Content.Content:Refresh() end
+							--
+							InputCheck = nil
+							Connections = nil
+							Open = nil
+						end
+						--
+						function Content.Content:Refresh(state)
+							for Index, Value in pairs(Open) do
+								Value[2].TextColor3 = Value[1] == Content.State and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
+								Value[3].TextColor3 = Value[1] == Content.State and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
+							end
+						end
+					end
+					--
+					Content.Content.Open = true
+					Content.Section.Content = Content.Content
+					--
+					Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(46, 46, 46)
+					--
+					do -- // Connections
+						task.wait()
+						--
+						InputCheck = utility:CreateConnection(uis.InputBegan, function(Input)
+							if Content.Content.Open and Input.UserInputType == Enum.UserInputType.MouseButton1 then
+								local Mouse = utility:MouseLocation()
+								--
+								local isInDropDown = Mouse.X > Content_Open_Holder.AbsolutePosition.X and Mouse.Y > Content_Open_Holder.AbsolutePosition.Y and Mouse.X < (Content_Open_Holder.AbsolutePosition.X + Content_Open_Holder.AbsoluteSize.X) and Mouse.Y < (Content_Open_Holder.AbsolutePosition.Y + Content_Open_Holder.AbsoluteSize.Y)
+								if isInDropDown and not (Mouse.X > Content_Open_Holder.AbsolutePosition.X  and Mouse.Y > (Content_Open_Holder.AbsolutePosition.Y + 36) and Mouse.X < (Content_Open_Holder.AbsolutePosition.X + Content_Open_Holder.AbsoluteSize.X) and Mouse.Y < (Content_Open_Holder.AbsolutePosition.Y + Content_Open_Holder.AbsoluteSize.Y + 36)) then
+									Content.Section:CloseContent()
+								end
+							end
+						end)
+					end
+				end
+			end
+			--
+			do -- // Connections
+				utility:CreateConnection(Content_Holder_Button.MouseButton1Down, function(Input)
+					if Content.Content.Open then
+						Content.Section:CloseContent()
+					else
+						Content:Open()
+					end
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseEnter, function(Input)
+					Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(46, 46, 46)
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseLeave, function(Input)
+					Holder_Outline_Frame.BackgroundColor3 = Content.Content.Open and Color3.fromRGB(46, 46, 46) or Color3.fromRGB(36, 36, 36)
+				end)
+			end
+			--
+			Content:Set(Content.State)
+		end
+		--
+		return Content
+	end
+	--
+	function sections:CreateMultibox(Properties)
+		Properties = Properties or {}
+		--
+		local Content = {
+			Name = (Properties.name or Properties.Name or Properties.title or Properties.Title or "New Dropdown"),
+			State = (Properties.state or Properties.State or Properties.def or Properties.Def or Properties.default or Properties.Default or {1}),
+			Options = (Properties.options or Properties.Options or Properties.list or Properties.List or {1, 2, 3}),
+			Minimum = (Properties.min or Properties.Min or Properties.minimum or Properties.Minimum or 0),
+			Maximum = (Properties.max or Properties.Max or Properties.maximum or Properties.Maximum or 1000),
+			Callback = (Properties.callback or Properties.Callback or Properties.callBack or Properties.CallBack or function() end),
+			Content = {
+				Open = false
+			},
+			Window = self.Window,
+			Page = self.Page,
+			Section = self
+		}
+		--
+		do
+			local Content_Holder = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content.Section.Holder,
+				Size = UDim2.new(1, 0, 0, 34 + 5),
+				ZIndex = 3
+			})
+			-- //
+			local Content_Holder_Outline = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 40, 0, 15),
+				Size = UDim2.new(1, -98, 0, 20),
+				ZIndex = 3
+			})
+			if Content.Name== "" or Content.Name== " " then
+				Content_Holder_Outline.Position= UDim2.new(0, 40, 0, 0) 
+				Content_Holder.Size = UDim2.new(1,0,0,25)
+			else
+				Content_Holder_Outline.Position= UDim2.new(0, 40, 0, 15) 
+				Content_Holder.Size = UDim2.new(1,0,0,39)
+			end
+			--
+			local Content_Holder_Title = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 4),
+				Size = UDim2.new(1, -41, 0, 10),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = Content.Name,
+				TextColor3 = Color3.fromRGB(205, 205, 205),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextXAlignment = "Left"
+			})
+			--
+			local Content_Holder_Title2 = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 4),
+				Size = UDim2.new(1, -41, 0, 10),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = Content.Name,
+				TextColor3 = Color3.fromRGB(205, 205, 205),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextTransparency = 0.5,
+				TextXAlignment = "Left"
+			})
+			--
+			local Content_Holder_Button = utility:RenderObject("TextButton", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = ""
+			})
+			-- //
+			local Holder_Outline_Frame = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(36, 36, 36),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder_Outline,
+				Position = UDim2.new(0, 1, 0, 1),
+				Size = UDim2.new(1, -2, 1, -2),
+				ZIndex = 3
+			})
+			-- //
+			local Outline_Frame_Gradient = utility:RenderObject("UIGradient", {
+				Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(220, 220, 220)),
+				Enabled = true,
+				Rotation = 270,
+				Parent = Holder_Outline_Frame
+			})
+			--
+			local Outline_Frame_Title = utility:RenderObject("TextLabel", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Holder_Outline_Frame,
+				Position = UDim2.new(0, 8, 0, 0),
+				Size = UDim2.new(1, 0, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = "",
+				TextColor3 = Color3.fromRGB(155, 155, 155),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextXAlignment = "Left"
+			})
+			--
+			local Outline_Frame_Title2 = utility:RenderObject("TextLabel", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Holder_Outline_Frame,
+				Position = UDim2.new(0, 8, 0, 0),
+				Size = UDim2.new(1, 0, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = "",
+				TextColor3 = Color3.fromRGB(155, 155, 155),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextTransparency = 0,
+				TextXAlignment = "Left"
+			})
+			--
+			local Outline_Frame_Arrow = utility:RenderObject("ImageLabel", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Holder_Outline_Frame,
+				Position = UDim2.new(1, -11, 0.5, -4),
+				Size = UDim2.new(0, 7, 0, 6),
+				Image = "rbxassetid://8532000591",
+				ImageColor3 = Color3.fromRGB(255, 255, 255),
+				ZIndex = 3
+			})
+			--
+			do -- // Functions
+				
+				function Content:SetVisibility()
+					Content_Holder.Visible = not Content_Holder.Visible
+				end
+				
+				function Content:Set(state)
+					table.sort(state)
+					Content.State = state
+					--
+					local Serialised = utility:Serialise(utility:Sort(Content:Get(), Content.Options))
+					--
+					Serialised = Serialised == "" and "-" or Serialised
+					--
+					if Content.Options[Content.State[1]] then
+					local Serialised2 = Content.Options[Content.State[1]].."..."
+						Outline_Frame_Title.Text = Serialised2
+						Outline_Frame_Title2.Text = Serialised2
+					else
+						Outline_Frame_Title.Text = "-"
+						Outline_Frame_Title2.Text = "-"
+					end
+					--
+					Content.Callback(Content:Get())
+					--
+					if Content.Content.Open then
+						Content.Content:Refresh(Content:Get())
+					end
+				end
+				--
+				function Content:Get()
+					return Content.State
+				end
+				--
+				function Content:Open()
+					Content.Section:CloseContent()
+					--
+					local Open = {}
+					local Connections = {}
+					--
+					local InputCheck
+					--
+					local Content_Open_Holder = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+						BackgroundTransparency = 1,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 0,
+						Parent = Content.Section.Extra,
+						Position = UDim2.new(0, Content_Holder_Outline.AbsolutePosition.X - Content.Section.Extra.AbsolutePosition.X, 0, Content_Holder_Outline.AbsolutePosition.Y - Content.Section.Extra.AbsolutePosition.Y + 21),
+						Size = UDim2.new(1, -98, 0, (18 * #Content.Options) + 2),
+						ZIndex = 6
+					})
+					-- //
+					local Open_Holder_Outline = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+						BackgroundTransparency = 0,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 0,
+						Parent = Content_Open_Holder,
+						Position = UDim2.new(0, 0, 0, 0),
+						Size = UDim2.new(1, 0, 1, 0),
+						ZIndex = 6
+					})
+					-- //
+					local Open_Holder_Outline_Frame = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(21, 21, 21),
+						BackgroundTransparency = 0,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 0,
+						Parent = Open_Holder_Outline,
+						Position = UDim2.new(0, 1, 0, 1),
+						Size = UDim2.new(1, -2, 1, -2),
+						ZIndex = 6
+					})
+					-- //
+					for Index, Option in pairs(Content.Options) do
+						local Outline_Frame_Option = utility:RenderObject("Frame", {
+							BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+							BackgroundTransparency = 0,
+							BorderColor3 = Color3.fromRGB(0, 0, 0),
+							BorderSizePixel = 0,
+							Parent = Open_Holder_Outline_Frame,
+							Position = UDim2.new(0, 0, 0, 18 * (Index - 1)),
+							Size = UDim2.new(1, 0, 1 / #Content.Options, 0),
+							ZIndex = 6
+						})
+						-- //
+						local Frame_Option_Title = utility:RenderObject("TextLabel", {
+							BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+							BackgroundTransparency = 1,
+							BorderColor3 = Color3.fromRGB(0, 0, 0),
+							BorderSizePixel = 0,
+							Parent = Outline_Frame_Option,
+							Position = UDim2.new(0, 8, 0, 0),
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 6,
+							FontFace = Font.fromId(11598121416),
+							RichText = true,
+							Text = tostring(Option),
+							TextColor3 = table.find(Content.State, Index) and Content.Window.Accent or Color3.fromRGB(205, 205, 205),
+							TextSize = library.TextSize,
+							TextStrokeTransparency = 1,
+							TextXAlignment = "Left"
+						})
+						--
+						local Frame_Option_Title2 = utility:RenderObject("TextLabel", {
+							BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+							BackgroundTransparency = 1,
+							BorderColor3 = Color3.fromRGB(0, 0, 0),
+							BorderSizePixel = 0,
+							Parent = Outline_Frame_Option,
+							Position = UDim2.new(0, 8, 0, 0),
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 6,
+							FontFace = Font.fromId(11598121416),
+							RichText = true,
+							Text = tostring(Option),
+							TextColor3 = table.find(Content.State, Index) and Content.Window.Accent or Color3.fromRGB(205, 205, 205),
+							TextSize = library.TextSize,
+							TextStrokeTransparency = 1,
+							TextTransparency = 0.5,
+							TextXAlignment = "Left"
+						})
+						--
+						local Frame_Option_Button = utility:RenderObject("TextButton", {
+							BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+							BackgroundTransparency = 1,
+							BorderColor3 = Color3.fromRGB(0, 0, 0),
+							BorderSizePixel = 0,
+							Parent = Outline_Frame_Option,
+							Size = UDim2.new(1, 0, 1, 0),
+							Text = "",
+							ZIndex = 6
+						})
+						
+						game["Run Service"].RenderStepped:Connect(function()
+							task.wait()
+							Frame_Option_Title2.TextColor3 = table.find(Content.State, Index) and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
+							Frame_Option_Title.TextColor3 = table.find(Content.State, Index) and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
+						end)
+						--
+						do -- // Connections
+							local Clicked = utility:CreateConnection(Frame_Option_Button.MouseButton1Click, function(Input)
+								local NewTable = Content:Get()
+								--
+								if table.find(NewTable, Index) then
+									if (#NewTable - 1) >= Content.Minimum then
+										table.remove(NewTable, table.find(NewTable, Index))
+									end
+								else
+									if (#NewTable + 1) <= Content.Maximum then
+										table.insert(NewTable, Index)
+									end
+								end
+								--
+								Content:Set(NewTable)
+							end)
+							--
+							local Entered = utility:CreateConnection(Frame_Option_Button.MouseEnter, function(Input)
+								Outline_Frame_Option.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+							end)
+							--
+							local Left = utility:CreateConnection(Frame_Option_Button.MouseLeave, function(Input)
+								Outline_Frame_Option.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+							end)
+							--
+							Connections[#Connections + 1] = Clicked
+							Connections[#Connections + 1] = Entered
+							Connections[#Connections + 1] = Left
+						end
+						--
+						Open[#Open + 1] = {Index, Frame_Option_Title, Frame_Option_Title2, Outline_Frame_Option, Frame_Option_Button}
+					end
+					--
+					do -- // Functions
+						function Content.Content:Close()
+							Content.Content.Open = false
+							--
+							Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(36, 36, 36)
+							--
+							for Index, Value in pairs(Connections) do
+								Value:Disconnect()
+							end
+							--
+							InputCheck:Disconnect()
+							--
+							for Index, Value in pairs(Open) do
+								Value[2]:Remove()
+								Value[3]:Remove()
+								Value[4]:Remove()
+								Value[5]:Remove()
+							end
+							--
+							Content_Open_Holder:Remove()
+							Open_Holder_Outline:Remove()
+							Open_Holder_Outline_Frame:Remove()
+							--
+							function Content.Content:Refresh() end
+							--
+							InputCheck = nil
+							Connections = nil
+							Open = nil
+						end
+						--
+						function Content.Content:Refresh(state)
+							for Index, Value in pairs(Open) do
+								Value[2].TextColor3 = table.find(Content.State, Value[1]) and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
+								Value[3].TextColor3 = table.find(Content.State, Value[1]) and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
+							end
+						end
+					end
+					--
+					Content.Content.Open = true
+					Content.Section.Content = Content.Content
+					--
+					Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(46, 46, 46)
+					--
+					do -- // Connections
+						task.wait()
+						--
+						InputCheck = utility:CreateConnection(uis.InputBegan, function(Input)
+							if Content.Content.Open and Input.UserInputType == Enum.UserInputType.MouseButton1 then
+								local Mouse = utility:MouseLocation()
+								--
+								local isInDropDown = Mouse.X > Content_Open_Holder.AbsolutePosition.X and Mouse.Y > Content_Open_Holder.AbsolutePosition.Y and Mouse.X < (Content_Open_Holder.AbsolutePosition.X + Content_Open_Holder.AbsoluteSize.X) and Mouse.Y < (Content_Open_Holder.AbsolutePosition.Y + Content_Open_Holder.AbsoluteSize.Y)
+								if isInDropDown and not (Mouse.X > Content_Open_Holder.AbsolutePosition.X and Mouse.Y > (Content_Open_Holder.AbsolutePosition.Y + 36) and Mouse.X < (Content_Open_Holder.AbsolutePosition.X + Content_Open_Holder.AbsoluteSize.X) and Mouse.Y < (Content_Open_Holder.AbsolutePosition.Y + Content_Open_Holder.AbsoluteSize.Y + 36)) then
+									Content.Section:CloseContent()
+								end
+							end
+						end)
+					end
+				end
+			end
+			--
+			do -- // Connections
+				utility:CreateConnection(Content_Holder_Button.MouseButton1Down, function(Input)
+					if Content.Content.Open then
+						Content.Section:CloseContent()
+					else
+						Content:Open()
+					end
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseEnter, function(Input)
+					Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(46, 46, 46)
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseLeave, function(Input)
+					Holder_Outline_Frame.BackgroundColor3 = Content.Content.Open and Color3.fromRGB(46, 46, 46) or Color3.fromRGB(36, 36, 36)
+				end)
+			end
+			--
+			Content:Set(Content.State)
+		end
+		--
+		return Content
+	end
+	--
+	function sections:CreateKeybind(Properties)
+		Properties = Properties or {}
+		--
+		local Content = {
+			Name = (Properties.name or Properties.Name or Properties.title or Properties.Title or "New Toggle"),
+			State = (Properties.state or Properties.State or Properties.def or Properties.Def or Properties.default or Properties.Default or nil),
+			Mode = (Properties.mode or Properties.Mode or "Hold"),
+			Callback = (Properties.callback or Properties.Callback or Properties.callBack or Properties.CallBack or function() end),
+			Active = false,
+			Holding = false,
+			Window = self.Window,
+			Page = self.Page,
+			Section = self,
+			Iznachalno = Properties.Iznachalno or "INS",
+		}
+		--
+		local Keys = {
+			KeyCodes = {"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Z", "X", "C", "V", "B", "N", "M", "One", "Two", "Three", "Four", "Five", "Six", "Seveen", "Eight", "Nine", "0", "Insert", "Tab", "Home", "End", "LeftAlt", "LeftControl", "LeftShift", "RightAlt", "RightControl", "RightShift", "CapsLock"},
+			Inputs = {"MouseButton1", "MouseButton2", "MouseButton3"},
+			Shortened = {["Insert"] = "INS", ["LeftAlt"] = "ALT", ["LeftControl"] = "CTR", ["LeftShift"] = "SHF", ["RightAlt"] = "ALT", ["RightControl"] = "CTR", ["RightShift"] = "SHF", ["CapsLock"] = "CAP"}
+		}
+		--
+		do
+			local Content_Holder = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content.Section.Holder,
+				Size = UDim2.new(1, 0, 0, 8 + 10),
+				ZIndex = 3
+			})
+			-- //
+			local Content_Holder_Title = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 0),
+				Size = UDim2.new(1, -41, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = Content.Name,
+				TextColor3 = Color3.fromRGB(205, 205, 205),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextXAlignment = "Left"
+			})
+			--
+			local Content_Holder_Title2 = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 0),
+				Size = UDim2.new(1, -41, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = Content.Name,
+				TextColor3 = Color3.fromRGB(205, 205, 205),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextTransparency = 0.5,
+				TextXAlignment = "Left"
+			})
+			--
+			local Content_Holder_Button = utility:RenderObject("TextButton", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = ""
+			})
+			-- //
+			local Content_Holder_Value = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 0),
+				Size = UDim2.new(1, -61, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text =  "["..Content.Iznachalno.."]",
+				TextColor3 = Color3.fromRGB(114, 114, 114),
+				TextStrokeColor3 = Color3.fromRGB(15, 15, 15),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 0,
+				TextXAlignment = "Right"
+			})
+			--
+			do -- // Functions
+				local icnachalned = false
+				function Content:SetVisibility()
+					Content_Holder.Visible = not Content_Holder.Visible
+				end
+				
+				function Content:Set(state)
+					Content.State = state or {}
+					Content.Active = false
+					
+					--
+					if icnachalned == true then
+						Content_Holder_Value.Text = "[" .. (#Content:Get() > 0 and Content:Shorten(Content:Get()[2]) or "-") .. "]"
+					else
+						Content_Holder_Value.Text =  "["..Content.Iznachalno.."]"
+					end
+					--
+					Content.Callback(Content:Get())
+					icnachalned = true
+				end
+				--
+				function Content:Get()
+					return Content.State
+				end
+				--
+				function Content:Shorten(Str)
+					for Index, Value in pairs(Keys.Shortened) do
+						Str = string.gsub(Str, Index, Value)
+					end
+					--
+					return Str
+				end
+				--
+				function Content:Change(Key)
+					if Key.EnumType then
+						if Key.EnumType == Enum.KeyCode or Key.EnumType == Enum.UserInputType then
+							if table.find(Keys.KeyCodes, Key.Name) or table.find(Keys.Inputs, Key.Name) then
+								Content:Set({Key.EnumType == Enum.KeyCode and "KeyCode" or "UserInputType", Key.Name})
+								return true
+							end
+						end
+					end
+				end
+			end
+			--
+			do -- // Connections
+				utility:CreateConnection(Content_Holder_Button.MouseButton1Click, function(Input)
+					Content.Holding = true
+					--
+					Content_Holder_Value.TextColor3 = Color3.fromRGB(255, 0, 0)
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseButton2Click, function(Input)
+					Content:Set()
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseEnter, function(Input)
+					Content_Holder_Value.TextColor3 = Color3.fromRGB(164, 164, 164)
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseLeave, function(Input)
+					Content_Holder_Value.TextColor3 = Content.Holding and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(114, 114, 114)
+				end)
+				--
+				utility:CreateConnection(uis.InputBegan, function(Input)
+					if Content.Holding then
+						local Success = Content:Change(Input.KeyCode.Name ~= "Unknown" and Input.KeyCode or Input.UserInputType)
+						--
+						if Success then
+							Content.Holding = false
+							--
+							Content_Holder_Value.TextColor3 = Color3.fromRGB(114, 114, 114)
+						end
+					end
+					--
+					if Content:Get()[1] and Content:Get()[2] then
+						if Input.KeyCode == Enum[Content:Get()[1]][Content:Get()[2]] or Input.UserInputType == Enum[Content:Get()[1]][Content:Get()[2]] then
+							if Content.Mode == "Hold" then
+								Content.Active = true
+							elseif Content.Mode == "Toggle" then
+								Content.Active = not Content.Active
+							end
+						end
+					end
+				end)
+				--
+				utility:CreateConnection(uis.InputEnded, function(Input)
+					if Content:Get()[1] and Content:Get()[2] then
+						if Input.KeyCode == Enum[Content:Get()[1]][Content:Get()[2]] or Input.UserInputType == Enum[Content:Get()[1]][Content:Get()[2]] then
+							if Content.Mode == "Hold" then
+								Content.Active = false
+							end
+						end
+					end
+				end)
+			end
+			--
+			Content:Set(Content.State)
+		end
+		--
+		return Content
+	end
+	--
+
+	function sections:CreateColorpicker(Properties)
+		Properties = Properties or {}
+		--
+		local Content = {
+			Name = (Properties.name or Properties.Name or Properties.title or Properties.Title or "New Toggle"),
+			State = (Properties.state or Properties.State or Properties.def or Properties.Def or Properties.default or Properties.Default or Color3.fromRGB(255, 255, 255)),
+			Callback = (Properties.callback or Properties.Callback or Properties.callBack or Properties.CallBack or function() end),
+			Content = {
+				Open = false
+			},
+			lastpos1= UDim2.new(0,0,0,0),
+			lastpos2 = UDim2.new(0.5,0,0,0),
+			Window = self.Window,
+			Page = self.Page,
+			Section = self,
+			PickerColor = Properties.State
+		}
+		--
+		do
+			local Content_Holder = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content.Section.Holder,
+				Size = UDim2.new(1, 0, 0, 8 + 10),
+				ZIndex = 3
+			})
+			
+			-- //
+			local Content_Holder_Outline = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(1, -38, 0, 4),
+				Size = UDim2.new(0, 17, 0, 9),
+				ZIndex = 3
+			})--срусл
+			
+			
+			
+			if Content.Name== "" or Content.Name== " " then
+				Content_Holder_Outline.Position= UDim2.new(1, -38,0, -13) 
+			else
+				Content_Holder_Outline.Position= UDim2.new(1, -38, 0, 4) 
+			end
+			
+			--
+			local Content_Holder_Title = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 0),
+				Size = UDim2.new(1, -41, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = Content.Name,
+				TextColor3 = Color3.fromRGB(205, 205, 205),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextXAlignment = "Left"
+			})
+			--
+			local Content_Holder_Title2 = utility:RenderObject("TextLabel", {
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 0),
+				Size = UDim2.new(1, -41, 1, 0),
+				ZIndex = 3,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = Content.Name,
+				TextColor3 = Color3.fromRGB(205, 205, 205),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextTransparency = 0.5,
+				TextXAlignment = "Left"
+			})
+			--
+			local Content_Holder_Button = utility:RenderObject("TextButton", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = ""
+			})
+			-- //
+			local Holder_Outline_Frame = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder_Outline,
+				Position = UDim2.new(0, 1, 0, 1),
+				Size = UDim2.new(1, -2, 1, -2),
+				ZIndex = 3
+			})
+			local graddd = utility:RenderObject("ImageLabel", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				AnchorPoint= Vector2.new(0.5,0.5),
+				Parent = Content_Holder_Outline,
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				Size = UDim2.new(4, 0, 5, 0),
+				Image = "rbxassetid://135021825022643",--1316045217 gradik
+				ImageColor3 = Content.Window.Accent,
+				ImageTransparency = 0.6,
+				ZIndex= 2,
+				Name = game.HttpService:GenerateGUID(false),
+			})
+			-- //
+			local Outline_Frame_Gradient = utility:RenderObject("UIGradient", {
+				Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(140, 140, 140)),
+				Enabled = true,
+				Rotation = 90,
+				Parent = Holder_Outline_Frame
+			})
+			--
+			do -- // Functions
+				local ColorH, ColorS, ColorV = 1, 1, 1
+				
+				function Content:SetVisibility()
+					Content_Holder.Visible = not Content_Holder.Visible
+				end
+				
+				function Content:SetVisibilityFalse()
+					Content_Holder.Visible = false
+				end
+				
+				function Content:SetVisibilityTrue()
+					Content_Holder.Visible = true
+				end
+
+				function Content:Set(state)
+					Content.State = state
+					--
+					Holder_Outline_Frame.BackgroundColor3 = Content.State
+					graddd.ImageColor3 = Content.State
+					--
+					Content.Callback(Content:Get())
+				end
+				--
+				function Content:Get()
+					return Content.State
+				end
+				--
+				function Content:Open()
+					Content.Section:CloseContent()
+					--
+					local Connections = {}
+					--
+					local InputCheck
+					--
+					local Content_Open_Holder = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+						BackgroundTransparency = 1,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 0,
+						Parent = Content.Section.Extra,
+						Position = UDim2.new(0, Content_Holder_Outline.AbsolutePosition.X - Content.Section.Extra.AbsolutePosition.X, 0, Content_Holder_Outline.AbsolutePosition.Y - Content.Section.Extra.AbsolutePosition.Y + 10),
+						Size = UDim2.new(0, 180, 0, 175),
+						ZIndex = 6
+					})
+					-- //
+					local Open_Holder_Button = utility:RenderObject("TextButton", {
+						BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+						BackgroundTransparency = 1,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 0,
+						Parent = Content_Open_Holder,
+						Position = UDim2.new(0, -1, 0, -1),
+						Size = UDim2.new(1, 2, 1, 2),
+						Text = ""
+					})
+					-- //
+					local Open_Holder_Outline = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+						BackgroundTransparency = 0,
+						BorderColor3 = Color3.fromRGB(12, 12, 12),
+						BorderMode = "Inset",
+						BorderSizePixel = 1,
+						Parent = Content_Open_Holder,
+						Position = UDim2.new(0, 0, 0, 0),
+						Size = UDim2.new(1, 0, 1, 0),
+						ZIndex = 6
+					})
+					-- //
+					local Open_Outline_Frame = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+						BackgroundTransparency = 0,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 0,
+						Parent = Open_Holder_Outline,
+						Position = UDim2.new(0, 1, 0, 1),
+						Size = UDim2.new(1, -2, 1, -2),
+						ZIndex = 6
+					})
+					-- //
+					local ValSat_Picker_Outline = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+						BackgroundTransparency = 0,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 0,
+						Parent = Open_Outline_Frame,
+						Position = UDim2.new(0, 2, 0, 2),
+						Size = UDim2.new(0, 152, 0, 152),
+						ZIndex = 6
+					})
+					--
+					local Hue_Picker_Outline = utility:RenderObject("ImageLabel", {
+						BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+						BackgroundTransparency = 0,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 1,
+						Parent = Open_Outline_Frame,
+						Position = UDim2.new(1, -19, 0, 2),
+						Size = UDim2.new(0, 17, 0, 152),
+						Image= "http://www.roblox.com/asset/?id=42463044",
+						ZIndex = 6
+					})
+					
+					
+					--
+					local Transparency_Picker_Outline = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+						BackgroundTransparency = 0,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 0,
+						Parent = Open_Outline_Frame,
+						Position = UDim2.new(0, 2, 1, -14),
+						Size = UDim2.new(0, 152, 0, 12),
+						ZIndex = 6,
+						Visible= true
+					})
+					-- //
+					
+					
+					
+					
+					local ValSat_Picker_Color = utility:RenderObject("ImageLabel", {
+						BackgroundColor3 = Content.PickerColor,
+						
+						BackgroundTransparency = 0,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 1,
+						Parent = ValSat_Picker_Outline,
+						Position = UDim2.new(0, 1, 0, 1),
+						Size = UDim2.new(1, -2, 1, -2),
+						Image = "http://www.roblox.com/asset/?id=42462986",
+						ZIndex = 6
+					})
+					local realcolor
+					local function UpdateColorPicker()
+						--print(Color3.fromHSV(ColorH, ColorS, ColorV))
+						
+						ValSat_Picker_Color.BackgroundColor3 = Color3.fromHSV(ColorH, 1, 1)
+						Content.PickerColor = Color3.fromHSV(ColorH, 1, 1)
+						
+						Holder_Outline_Frame.BackgroundColor3 = Color3.fromHSV(ColorH, ColorS, ColorV)
+						graddd.ImageColor3 = Color3.fromHSV(ColorH, ColorS, ColorV)
+						pcall(Content.Callback,Color3.fromHSV(ColorH, ColorS, ColorV))
+					end
+					
+					local CursorPicker = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+						Visible = true,
+						BackgroundTransparency = 0.3,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						BorderSizePixel = 1,
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Parent = ValSat_Picker_Color,
+						Position = UDim2.new(Content.State and select(3, Color3.toHSV(Content.State))),
+						Size = UDim2.new(0, 2, 0, 2),
+						ZIndex = 99999
+					})
+					local CursorPicker2 = utility:RenderObject("Frame", {
+						BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+						BackgroundTransparency = 0.3,
+						BorderColor3 = Color3.fromRGB(0, 0, 0),
+						Visible = true,
+						BorderSizePixel = 1,
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Parent = Hue_Picker_Outline,
+						Position =  UDim2.new(0.5, 0, 1 - select(1, Color3.toHSV(Content.State))),
+						Size = UDim2.new(1, 0, 0,2),
+						ZIndex = 99999
+					})
+					--
+
+
+					local ColorInput = nil
+					local HueInput = nil
+
+					CursorPicker.Position = Content.lastpos1 
+					CursorPicker2.Position = Content.lastpos2
+
+					ValSat_Picker_Color.InputBegan:Connect(
+						
+						function(input)
+							if input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+
+								if ColorInput then
+									ColorInput:Disconnect()
+								end
+
+								ColorInput =
+									game["Run Service"].RenderStepped:Connect(function()
+										if Content_Open_Holder.Visible == true then
+											local ColorX =(math.clamp(game.Players.LocalPlayer:GetMouse().X - ValSat_Picker_Color.AbsolutePosition.X, 0, ValSat_Picker_Color.AbsoluteSize.X) /
+												ValSat_Picker_Color.AbsoluteSize.X)
+											local ColorY =(math.clamp(game.Players.LocalPlayer:GetMouse().Y - ValSat_Picker_Color.AbsolutePosition.Y, 0, ValSat_Picker_Color.AbsoluteSize.Y) /
+												ValSat_Picker_Color.AbsoluteSize.Y)
+
+											CursorPicker.Position = UDim2.new(ColorX, 0, ColorY, 0)
+											Content.lastpos1 = CursorPicker.Position
+											ColorS = ColorX
+											ColorV = 1 - ColorY
+
+											UpdateColorPicker()
+										end
+									end)
+							end
+						end)
+
+					ValSat_Picker_Color.InputEnded:Connect(function(input)
+						if input.UserInputType == Enum.UserInputType.MouseButton1 then
+							if ColorInput then
+								ColorInput:Disconnect()
+							end
+						end
+					end)
+
+					Hue_Picker_Outline.InputBegan:Connect(
+						function(input)
+							if input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+
+								if HueInput then
+									HueInput:Disconnect()
+								end
+
+								HueInput =
+									game["Run Service"].RenderStepped:Connect(
+										function()
+											local HueY =(math.clamp(game.Players.LocalPlayer:GetMouse().Y - Hue_Picker_Outline.AbsolutePosition.Y, 0, Hue_Picker_Outline.AbsoluteSize.Y) /
+												Hue_Picker_Outline.AbsoluteSize.Y)
+
+											CursorPicker2.Position = UDim2.new(0.5, 0, HueY, 0)
+											Content.lastpos2 = CursorPicker2.Position
+											ColorH = 1 - HueY
+
+											UpdateColorPicker()
+										end)
+							end
+						end)
+
+
+					Hue_Picker_Outline.InputEnded:Connect(
+						function(input)
+							if input.UserInputType == Enum.UserInputType.MouseButton1 then
+								if HueInput then
+									HueInput:Disconnect()
+								end
+							end
+						end
+					)
+					--
+					do -- // Functions
+						function Content.Content:Close()
+							Content.Content.Open = false
+							--
+							for Index, Value in pairs(Connections) do
+								Value:Disconnect()
+							end
+							--
+							if ColorInput then
+								ColorInput:Disconnect()
+							end
+							--
+							Content.lastpos1 = CursorPicker.Position
+							Content.lastpos2 = CursorPicker2.Position
+							
+							Content_Open_Holder:Remove()
+							
+							--
+							function Content.Content:Refresh() end
+							--
+							ColorInput = nil
+							Connections = nil
+						end
+						--
+						function Content.Content:Refresh(state)
+						end
+					end
+					--
+					Content.Content.Open = true
+					Content.Section.Content = Content.Content
+					--
+					do -- // Connections
+						
+					end
+				end
+			end
+			--
+			do -- // Connections
+				utility:CreateConnection(Content_Holder_Button.MouseButton1Click, function(Input)
+					if Content.Content.Open then
+						
+						Content.Section:CloseContent()
+					else
+						Content:Open()
+					end
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseEnter, function(Input)
+					Outline_Frame_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(180, 180, 180))
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseLeave, function(Input)
+					Outline_Frame_Gradient.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(140, 140, 140))
+				end)
+			end
+			--
+			Content:Set(Content.State)
+		end
+		--
+		return Content
+	end
+	function sections:CreateButton(Properties)
+		Properties = Properties or {}
+		--
+		local Content = {
+			Name = (Properties.name or Properties.Name or Properties.title or Properties.Title or "New Button"),
+			Callback = (Properties.callback or Properties.Callback or function() end),
+			Window = self.Window,
+			Page = self.Page,
+			Section = self,
+			Text= Properties.Text,
+		}
+		--
+		do
+			local Content_Holder = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content.Section.Holder,
+				Size = UDim2.new(1, 0, 0, 34 + 5),
+				ZIndex = 3
+			})
+			-- //
+			local Content_Holder_Outline = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 40, 0, 15),
+				Size = UDim2.new(1, -98, 0, 20),
+				ZIndex = 3
+			})
+			--
+			if Content.Text== "" or Content.Text== " " then
+				Content_Holder_Outline.Position= UDim2.new(0, 40, 0, 0) 
+			else
+				Content_Holder_Outline.Position= UDim2.new(0, 40, 0, 15) 
+			end
+			--
+			local Outline_Frame_Title = utility:RenderObject("TextLabel", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder_Outline,
+				Position = UDim2.new(0, 8, 0, 0),
+				Size = UDim2.new(1, 0, 1, 0),
+				ZIndex = 9,
+				FontFace = Font.fromId(11598121416),
+				RichText = true,
+				Text = Content.Name,
+				TextColor3 = Color3.fromRGB(155, 155, 155),
+				TextSize = library.TextSize,
+				TextStrokeTransparency = 1,
+				TextXAlignment = "Left"
+			})
+			local Content_Holder_Button = utility:RenderObject("TextButton", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = ""
+			})
+			-- //
+			local Holder_Outline_Frame = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(36, 36, 36),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder_Outline,
+				Position = UDim2.new(0, 1, 0, 1),
+				Size = UDim2.new(1, -2, 1, -2),
+				ZIndex = 3
+			})
+			-- //
+			local Outline_Frame_Gradient = utility:RenderObject("UIGradient", {
+				Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(220, 220, 220)),
+				Enabled = true,
+				Rotation = 270,
+				Parent = Holder_Outline_Frame
+			})
+			--
+			do -- // Connections
+				utility:CreateConnection(Content_Holder_Button.MouseButton1Click, function()
+					Content.Callback()
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseEnter, function()
+					Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(46, 46, 46)
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseLeave, function()
+					Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(36, 36, 36)
+				end)
+			end
+		end
+		--
+		return Content
+	end
+end
+
+local playerTime = getCurrentTime()
+print("library has started ".. playerTime)
+return library
+-- 
