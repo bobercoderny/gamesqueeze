@@ -117,7 +117,7 @@ local function getCurrentTime()
 	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
 end
 local daaaa
-function library:createHit(text,color)
+function library:createHit(text,tag,color,padding,start,animspeed)
 	task.spawn(function()
 		local Section_Holder_Title = utility:RenderObject("TextLabel", {
 			AnchorPoint = Vector2.new(0.5, 0.5),
@@ -131,21 +131,43 @@ function library:createHit(text,color)
 			ZIndex = 5,
 			Font = Enum.Font.Code,
 			RichText = true,
-			Text = text,
-			TextColor3 = color,
+			Text = `<font color="{tag}">[liquidware.h2o]</font><font color="{color}"> {text} </font>`,
+			--TextColor3 = color,
 			Visible= true,
 			TextSize = 11,
 			TextTransparency = 0,
 			TextStrokeTransparency = 1,
 			TextXAlignment = "Center"
 		})
-
+		local uilist = utility:RenderObject("UIPadding", {
+			Parent = Section_Holder_Title,
+			PaddingBottom= UDim.new(0,0),
+			PaddingLeft = UDim.new(0,0),
+			PaddingRight = UDim.new(0,0),
+			PaddingTop = UDim.new(0,0)
+		})
+		if padding== "PaddingBottom" then
+			uilist.PaddingBottom = UDim.new(0,start)
+		end
+		if padding== "PaddingLeft" then
+			uilist.PaddingLeft = UDim.new(0,start)
+		end
+		if padding== "PaddingRight" then
+			uilist.PaddingRight = UDim.new(0,start)
+		end
+		if padding== "PaddingTop" then
+			uilist.PaddingTop = UDim.new(0,start)
+		end
 		if Section_Holder_Title then
+			local tween2 = tws:Create(uilist, TweenInfo.new(animspeed or 0.5,Enum.EasingStyle.Sine), {PaddingBottom = UDim.new(0,0),PaddingLeft = UDim.new(0,0),PaddingRight = UDim.new(0,0),PaddingTop = UDim.new(0,0)})
+			
+			tween2:Play()
+			tween2.Completed:Wait()
 			wait(5)
-			local tween = tws:Create(Section_Holder_Title, TweenInfo.new(0.5,Enum.EasingStyle.Sine), {TextTransparency = 1})
+			local tween = tws:Create(Section_Holder_Title, TweenInfo.new(1.5,Enum.EasingStyle.Sine), {TextTransparency = 1})
 			tween:Play()
 			tween.Completed:Wait()
-				Section_Holder_Title:Remove()
+			Section_Holder_Title:Remove()
 		end
 	end)
 end
@@ -176,9 +198,32 @@ function library:CreateTextLabel()
 		Parent = hits,
 		FillDirection = "Vertical",
 		HorizontalAlignment = "Center",
-		VerticalAlignment = "Bottom"
+		VerticalAlignment = "Bottom",
+		ItemLineAlignment= "End",
+		
 	})
 	daaaa = hits
+end
+
+function library:CreateHitlog()
+	local Content_Holder_Title = utility:RenderObject("TextLabel", {
+		AnchorPoint = Vector2.new(0, 0),
+		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+		BackgroundTransparency = 1,
+		BorderColor3 = Color3.fromRGB(0, 0, 0),
+		BorderSizePixel = 0,
+		Parent = daaaa,
+		Position = UDim2.new(0, 41, 0, 4),
+		Size = UDim2.new(1, -41, 0, 10),
+		ZIndex = 3,
+		FontFace = Font.fromId(11598121416),
+		RichText = true,
+		Text = "hi",
+		TextColor3 = Color3.fromRGB(205, 205, 205),
+		TextSize = library.TextSize,
+		TextStrokeTransparency = 1,
+		TextXAlignment = "Left"
+	})
 end
 
 -- [[ // UI Functions // ]]
@@ -487,8 +532,8 @@ function library:CreateWindow(Properties)
 			BorderColor3 = Color3.fromRGB(0, 0, 0),
 			BorderSizePixel = 0,
 			Parent = InnerFrame_Pages_InnerBorder,
-			Position = UDim2.new(0, 1, 0, 0),
-			Size = UDim2.new(1, -1, 1, 0),
+			Position = UDim2.new(0, 0, 0, 0),
+			Size = UDim2.new(1, 0, 1, 0),
 			Name = game.HttpService:GenerateGUID(false),
 		})
 
