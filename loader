@@ -1,5 +1,3 @@
--- gg/tVHvBYPDmf
-
 --[[
 
 EXAMPLES
@@ -36,7 +34,24 @@ local library = {
 	Connections = {},
 	Configs = "Configs",
 	TextSize = 11,
+	Accent = Color3.fromRGB(0,255,255),
+	Enabled = true,
 }
+
+local tws = game:GetService("TweenService")
+local rn = game:GetService("RunService")
+local uis = game:GetService("UserInputService")
+local cre
+
+local blur = Instance.new("BlurEffect",game.Workspace.CurrentCamera)
+blur.Size = 0
+blur.Enabled = true
+
+if game:GetService("RunService"):IsStudio() then
+	cre =  game.Players.LocalPlayer.PlayerGui
+else
+	cre =  game.CoreGui
+end
 
 local utility = {}
 local pages = {}
@@ -46,18 +61,16 @@ do
 	pages.__index = pages
 	sections.__index = sections
 end
--- [[ // Variables // ]] 
-local tws = game:GetService("TweenService")
-local uis = game:GetService("UserInputService")
-local cre
 
-if game:GetService("RunService"):IsStudio() then
-	cre =  game.Players.LocalPlayer.PlayerGui
-else
-	cre =  game.CoreGui
+local function getCurrentTime()
+	local currentTime = os.date("*t") 
+	local hours = string.format("%02d", currentTime.hour) 
+	local minutes = string.format("%02d", currentTime.min) 
+	local seconds = string.format("%02d", currentTime.sec) 
+	local milliseconds = math.floor((os.clock() % 1) * 1000) 
+	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
 end
 
--- [[ // Functions // ]]
 function utility:RenderObject(RenderType, RenderProperties, RenderHidden)
 	local Render = Instance.new(RenderType)
 	--
@@ -108,136 +121,22 @@ function utility:Sort(Table1, Table2)
 	return Table3
 end
 
-local function getCurrentTime()
-	local currentTime = os.date("*t") 
-	local hours = string.format("%02d", currentTime.hour) 
-	local minutes = string.format("%02d", currentTime.min) 
-	local seconds = string.format("%02d", currentTime.sec) 
-	local milliseconds = math.floor((os.clock() % 1) * 1000) 
-	return string.format("%s:%s:%s:%03d", hours, minutes, seconds, milliseconds)
-end
-local daaaa
-function library:createHit(text,tag,color,padding,start,animspeed)
-	task.spawn(function()
-		local Section_Holder_Title = utility:RenderObject("TextLabel", {
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-			BackgroundTransparency = 1,
-			BorderColor3 = Color3.fromRGB(0, 0, 0),
-			BorderSizePixel = 0,
-			Parent = daaaa,
-			Position = UDim2.new(0.5,0,0.5,0),
-			Size = UDim2.new(1,0,0.1,0),
-			ZIndex = 5,
-			Font = Enum.Font.Code,
-			RichText = true,
-			Text = `<font color="{tag}">[liquidware.h2o]</font><font color="{color}"> {text} </font>`,
-			--TextColor3 = color,
-			Visible= true,
-			TextSize = 11,
-			TextTransparency = 0,
-			TextStrokeTransparency = 1,
-			TextXAlignment = "Center"
-		})
-		local uilist = utility:RenderObject("UIPadding", {
-			Parent = Section_Holder_Title,
-			PaddingBottom= UDim.new(0,0),
-			PaddingLeft = UDim.new(0,0),
-			PaddingRight = UDim.new(0,0),
-			PaddingTop = UDim.new(0,0)
-		})
-		if padding== "PaddingBottom" then
-			uilist.PaddingBottom = UDim.new(0,start)
-		end
-		if padding== "PaddingLeft" then
-			uilist.PaddingLeft = UDim.new(0,start)
-		end
-		if padding== "PaddingRight" then
-			uilist.PaddingRight = UDim.new(0,start)
-		end
-		if padding== "PaddingTop" then
-			uilist.PaddingTop = UDim.new(0,start)
-		end
-		if Section_Holder_Title then
-			local tween2 = tws:Create(uilist, TweenInfo.new(animspeed or 0.5,Enum.EasingStyle.Sine), {PaddingBottom = UDim.new(0,0),PaddingLeft = UDim.new(0,0),PaddingRight = UDim.new(0,0),PaddingTop = UDim.new(0,0)})
-			
-			tween2:Play()
-			tween2.Completed:Wait()
-			wait(5)
-			local tween = tws:Create(Section_Holder_Title, TweenInfo.new(1.5,Enum.EasingStyle.Sine), {TextTransparency = 1})
-			tween:Play()
-			tween.Completed:Wait()
-			Section_Holder_Title:Remove()
-		end
-	end)
-end
-
-function library:CreateTextLabel()
-	local ScreenGui = utility:RenderObject("ScreenGui", {
-		DisplayOrder = 9999,
-		Enabled = true,
-		Name = game.HttpService:GenerateGUID(false),
-		IgnoreGuiInset = true,
-		Parent = cre,
-		ResetOnSpawn = false,
-		ZIndexBehavior = "Global"
-	})
-	
-	local hits = utility:RenderObject("Frame", {
-		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-		BackgroundTransparency = 1,
-		BorderColor3 = Color3.fromRGB(0, 0, 0),
-		BorderSizePixel = 0,
-		Parent = ScreenGui,
-		AnchorPoint = Vector2.new(0.5,0.5),
-		Position = UDim2.new(0.5, 0, 0.8, 0),
-		Size = UDim2.new(0.3, 0, 0.2, 0)
-	})
-	local uilist = utility:RenderObject("UIListLayout", {
-		Padding = UDim.new(0, 8),
-		Parent = hits,
-		FillDirection = "Vertical",
-		HorizontalAlignment = "Center",
-		VerticalAlignment = "Bottom",
-		ItemLineAlignment= "End",
-		
-	})
-	daaaa = hits
-end
-
-function library:CreateHitlog()
-	local Content_Holder_Title = utility:RenderObject("TextLabel", {
-		AnchorPoint = Vector2.new(0, 0),
-		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-		BackgroundTransparency = 1,
-		BorderColor3 = Color3.fromRGB(0, 0, 0),
-		BorderSizePixel = 0,
-		Parent = daaaa,
-		Position = UDim2.new(0, 41, 0, 4),
-		Size = UDim2.new(1, -41, 0, 10),
-		ZIndex = 3,
-		FontFace = Font.fromId(11598121416),
-		RichText = true,
-		Text = "hi",
-		TextColor3 = Color3.fromRGB(205, 205, 205),
-		TextSize = library.TextSize,
-		TextStrokeTransparency = 1,
-		TextXAlignment = "Left"
-	})
-end
-
--- [[ // UI Functions // ]]
 function library:CreateWindow(Properties)
 	Properties = Properties or {}
 	--
 	local Window = {
 		Pages = {},
-		Accent = Color3.fromRGB(255, 88, 91),
+		Accent = Color3.fromRGB(0, 255, 255),
 		Enabled = true,
 		MenuResize = false,
 		Key = Enum.KeyCode.RightShift, -- key
+		Shadow = true,Blur = true,Background = true,
 	}
-	
+	rn.RenderStepped:Connect(function()
+		library.Accent = Window.Accent
+		library.Enabled = Window.Enabled
+		
+	end)
 	--
 	do
 		local playerTime = getCurrentTime()
@@ -251,30 +150,11 @@ function library:CreateWindow(Properties)
 			ResetOnSpawn = false,
 			ZIndexBehavior = "Global"
 		})
-		
-		--[[
-		
-		local Background = utility:RenderObject("ImageLabel", {
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundColor3 = Color3.fromRGB(25, 25, 25),
-			BackgroundTransparency = 0,
-			BorderColor3 = Color3.fromRGB(12, 12, 12),
-			BorderMode = "Inset",
-			BorderSizePixel = 1,
-			Parent = ScreenGui,
-			Image = "rbxassetid://16771469449",
-			ZIndex= -1,
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = UDim2.new(1,0,1,0),
-			Name = game.HttpService:GenerateGUID(false),
-		})
-		
-		
-		]]
+
 		local CanvasGGroup = utility:RenderObject("CanvasGroup", {
 			AnchorPoint = Vector2.new(0,0),
 			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-			BackgroundTransparency = 0.5,
+			BackgroundTransparency = 1,
 			BorderColor3 = Color3.fromRGB(12, 12, 12),
 			BorderMode = "Inset",
 			BorderSizePixel = 0,
@@ -282,35 +162,68 @@ function library:CreateWindow(Properties)
 			Size = UDim2.new(1,0,1,0),
 			Name = game.HttpService:GenerateGUID(false),
 		})
+		
+		local CanvasGGGroup = utility:RenderObject("CanvasGroup", {
+			AnchorPoint = Vector2.new(0,0),
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 0.5,
+			BorderColor3 = Color3.fromRGB(12, 12, 12),
+			BorderMode = "Inset",
+			BorderSizePixel = 0,
+			Parent = CanvasGGroup,
+			Size = UDim2.new(1,0,1,0),
+			Name = game.HttpService:GenerateGUID(false),
+		})
 		local UiScale = Instance.new("UIScale",ScreenGui)
 		UiScale.Scale= 1	
+		
 		local ScreenGui_MainFrame = utility:RenderObject("Frame", {
 			AnchorPoint = Vector2.new(0,0),
 			BackgroundColor3 = Color3.fromRGB(25, 25, 25),
 			BackgroundTransparency = 0,
-			BorderColor3 = Color3.fromRGB(12, 12, 12),
+			BorderColor3 = Color3.fromRGB(35,35,35), --Window.Accent,
 			BorderMode = "Inset",
 			BorderSizePixel = 1,
 			Parent = CanvasGGroup,
-			Size = UDim2.new(0, 630, 0, 770),
+			Size = UDim2.new(0, 750, 0, 500),
 			Name = game.HttpService:GenerateGUID(false),
 		})
+		
+		local Shadow = utility:RenderObject("ImageLabel", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			AnchorPoint = Vector2.new(0.5,0.5),
+			BorderSizePixel = 0,
+			Parent = ScreenGui_MainFrame,
+			Position = UDim2.new(0.5,0,0.5,2),
+			Size = UDim2.new(1.15,0,1.15,0),
+			Image = "rbxassetid://1316045217",
+			ImageColor3 = Color3.fromRGB(0, 0, 0),
+			ImageTransparency= 0.5,
+			ZIndex = -1,Name=game.HttpService:GenerateGUID(false),
+		})
+		
+		local uistroke = utility:RenderObject("UIStroke", {
+			Color = Color3.fromRGB(0,0,0),
+			Thickness = 1,
+			Parent = ScreenGui_MainFrame,
+			Transparency = 0,
+			LineJoinMode = "Miter",
+			ApplyStrokeMode = "Border",
+			Name= game.HttpService:GenerateGUID(false),
+		})
+		
 		local parentSize = ScreenGui_MainFrame.Size
 		local parentWidth = parentSize.X.Offset
 		local parentHeight = parentSize.Y.Offset
-		
+
 		local mySize = ScreenGui_MainFrame.Size
 		local myWidth = mySize.X.Offset
 		local myHeight = mySize.Y.Offset
 		
-		ScreenGui_MainFrame.Position = UDim2.new(0, (parentWidth - myWidth) / 2, 0, (parentHeight - myHeight) / 2)
-		
-		local candrag = true
-		
-		local player = game.Players.LocalPlayer
-
 		local frame = ScreenGui_MainFrame
-
+		local candrag =  true
 		local dragging = false
 		local dragStart = nil
 		local startPos = nil
@@ -322,19 +235,15 @@ function library:CreateWindow(Properties)
 			local screenSize = workspace.CurrentCamera.ViewportSize
 			local frameSize = frame.Size
 
-			local newPos = frame.Position
+			local delta = input.Position - dragStart
+			local newPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 
-			if newPos.X.Offset < 0 then
-				newPos = UDim2.new(0, 0, newPos.Y.Scale, newPos.Y.Offset)
-			elseif newPos.X.Offset + frameSize.X.Offset > screenSize.X then
-				newPos = UDim2.new(1, -frameSize.X.Offset, newPos.Y.Scale, newPos.Y.Offset)
-			end
-
-			if newPos.Y.Offset < 0 then
-				newPos = UDim2.new(newPos.X.Scale, newPos.X.Offset, 0, 0)
-			elseif newPos.Y.Offset + frameSize.Y.Offset > screenSize.Y then
-				newPos = UDim2.new(newPos.X.Scale, newPos.X.Offset, 1, -frameSize.Y.Offset)
-			end
+			newPos = UDim2.new(
+				math.clamp(newPos.X.Scale, 0, 1 - (frame.Size.X.Scale)),
+				math.clamp(newPos.X.Offset, 0, frame.Parent.Parent.AbsoluteSize.X - frame.Size.X.Offset),
+				math.clamp(newPos.Y.Scale, 0, 1 - (frame.Size.Y.Scale)),
+				math.clamp(newPos.Y.Offset, 0, frame.Parent.Parent.AbsoluteSize.Y - frame.Size.Y.Offset)
+			)
 
 			frame.Position = newPos
 		end
@@ -359,8 +268,6 @@ function library:CreateWindow(Properties)
 			end
 		end)
 
-
-			
 		local ScreenGui_MainFrame_InnerBorder = utility:RenderObject("Frame", {
 			BackgroundColor3 = Color3.fromRGB(40, 40, 40),
 			BackgroundTransparency = 0,
@@ -383,6 +290,17 @@ function library:CreateWindow(Properties)
 			Size = UDim2.new(1, -6, 1, -6),
 			Name = game.HttpService:GenerateGUID(false),
 		})
+		
+		local uistroke2 = utility:RenderObject("UIStroke", {
+			Color = Color3.fromRGB(0,0,0),
+			Thickness = 1,
+			Parent = MainFrame_InnerBorder_InnerFrame,
+			Transparency = 0,
+			LineJoinMode = "Miter",
+			ApplyStrokeMode = "Border",
+			Name= game.HttpService:GenerateGUID(false),
+		})
+		
 		local ResizeButton = utility:RenderObject("TextButton", {
 			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
 			BackgroundTransparency = 1,
@@ -395,7 +313,7 @@ function library:CreateWindow(Properties)
 			Size = UDim2.new(0.1, 15, 0.1, 15),
 			Text = ""
 		}) 
-		
+
 		local function resize()
 			local button = ResizeButton
 			local main = ScreenGui_MainFrame
@@ -426,32 +344,122 @@ function library:CreateWindow(Properties)
 
 			button.MouseButton1Down:Connect(function()
 				if Window.MenuResize == true then
-				local lastPos = Vector2.new(mouse.X, mouse.Y)
-				resizeConnection = mouse.Move:Connect(function()
-					local new = Vector2.new(mouse.X, mouse.Y)
-					local delta = new - lastPos
-					lastPos = new
-					main.Size += UDim2.fromOffset(delta.X, delta.Y)
-					checkSize()
-				end)
+					local lastPos = Vector2.new(mouse.X, mouse.Y)
+					resizeConnection = mouse.Move:Connect(function()
+						local new = Vector2.new(mouse.X, mouse.Y)
+						local delta = new - lastPos
+						lastPos = new
+						main.Size += UDim2.fromOffset(delta.X, delta.Y)
+						checkSize()
+					end)
 					connectInputFunction()
 				end
 			end)
 		end
-		
+
 		resize()
-		
+
 		local InnerBorder_InnerFrame_Tabs = utility:RenderObject("Frame", {
 			BackgroundColor3 = Color3.fromRGB(12, 12, 12),
 			BackgroundTransparency = 0,
 			BorderColor3 = Color3.fromRGB(0, 0, 0),
 			BorderSizePixel = 0,
 			Parent = MainFrame_InnerBorder_InnerFrame,
-			Position = UDim2.new(0, 0, 0, 4),
-			Size = UDim2.new(1, 0, 0, 69),
+			Position = UDim2.new(0, 0, 0,0),
+			Size = UDim2.new(1, 0, 0, 35),
 			Name = "ontop",
+			ZIndex = 9,
 		})
+		
+		local ingore = utility:RenderObject("Frame", {
+			BackgroundColor3 = Color3.fromRGB(23,23,23),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(60, 60, 60),
+			BorderSizePixel = 1,
+			Parent = MainFrame_InnerBorder_InnerFrame,
+			Position = UDim2.new(0, 0, 1,0),
+			AnchorPoint = Vector2.new(0,1),
+			ZIndex = 9,
+			Size = UDim2.new(1, 0, 0, 35),
+			Name = "down",
+		})
+		
+		local Section_Holder_Title = utility:RenderObject("TextLabel", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderColor3 = Color3.fromRGB(0, 0, 0),
+			BorderSizePixel = 0,
+			Parent = ingore,
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = UDim2.new(1, 0, 0, 0),
+			ZIndex = 9,
+			FontFace = Font.fromId(11598121416),
+			RichText = true,
+			Text = "liquidware",
+			TextColor3 = Color3.fromRGB(205, 205, 205),
+			TextSize = 11,
+			TextStrokeTransparency = 1,
+			TextXAlignment = "Center"
+		})
+		
+		rn.RenderStepped:Connect(function()
+			Shadow.Visible = Window.Shadow
+			blur.Enabled = Window.Blur
+			CanvasGGGroup.Visible = Window.Background
+		end)
+		
+		task.spawn(function()
+			if library.Enabled == true then
+				local symbols = {"#", "*"}
+				local symbols2 = {"/","."}
+				local symbols3 = {"?", "%", "§"}
+				local index = 1
+				local index2 = 1
+				local index3 = 1
+				while task.wait() do
+					local waittime = 0.1
+					for i = 1, 10 do 
+						local symbol1 = symbols[index] or ""
+						local symbol2 = symbols2[index2] or ""
+						local symbol3 = symbols3[index3] or ""
 
+						local symbolsArray = {symbol1, symbol2, symbol3}
+						local function shuffle(array)
+							for i = #array, 2, -1 do
+								local j = math.random(i)
+								array[i], array[j] = array[j], array[i] 
+							end
+						end
+
+						shuffle(symbolsArray)
+
+						Section_Holder_Title.Text = table.concat(symbolsArray) .. "  liquidware.h2o  " .. table.concat(symbolsArray)
+						
+						index = index + 1
+						index2 = index2 + 1
+						index3 = index3 + 1
+						
+						if index > #symbols then
+							index = 1
+						end
+						if index2 > #symbols2 then
+							index2 = 1
+						end
+						if index3 > #symbols3 then
+							index3 = 1
+						end
+
+						wait(waittime)
+					end
+					Section_Holder_Title.Text = [[<font color="rgb(0, 255, 0)">$$$  </font> liquidware.h2o <font color="rgb(0, 255, 0)">  $$$</font>]]
+
+					wait(5)
+				end
+			end
+		end)
+
+		
 		local InnerBorder_InnerFrame_Pages = utility:RenderObject("Frame", {
 			AnchorPoint = Vector2.new(1, 0),
 			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
@@ -459,34 +467,18 @@ function library:CreateWindow(Properties)
 			BorderColor3 = Color3.fromRGB(0, 0, 0),
 			BorderSizePixel = 0,
 			Parent = MainFrame_InnerBorder_InnerFrame,
-			Position = UDim2.new(1, 0, 0, 74),
-			Size = UDim2.new(1, 0, 1, -74),
+			Position = UDim2.new(1, 0, 0, 35),
+			Size = UDim2.new(1, 0, 1, -70),
 			Name = "test",
 		})
 
-		local InnerBorder_InnerFrame_TopGradient = utility:RenderObject("Frame", {
-			BackgroundColor3 = Color3.fromRGB(12, 12, 12),
-			BackgroundTransparency = 0,
-			BorderColor3 = Color3.fromRGB(0, 0, 0),
-			BorderSizePixel = 0,
-			Parent = MainFrame_InnerBorder_InnerFrame,
-			Position = UDim2.new(0, 0, 0, 0),
-			Size = UDim2.new(1, 0, 0, 4),
-			Name = game.HttpService:GenerateGUID(false),
-		})
-
 		local InnerFrame_Tabs_List = utility:RenderObject("UIListLayout", {
-			Padding = UDim.new(0, 4),
+			Padding = UDim.new(0, 0),
 			Parent = InnerBorder_InnerFrame_Tabs,
 			FillDirection = "Horizontal",
-			HorizontalAlignment = "Center",
+			HorizontalAlignment = "Right",
 			VerticalAlignment = "Top",
 			Name= "test",
-		})
-
-		local InnerFrame_Tabs_Padding = utility:RenderObject("UIPadding", {
-			Parent = InnerBorder_InnerFrame_Tabs,
-			PaddingTop = UDim.new(0, 9),
 		})
 
 		local InnerFrame_Pages_InnerBorder = utility:RenderObject("Frame", {
@@ -499,33 +491,7 @@ function library:CreateWindow(Properties)
 			Size = UDim2.new(1, 0, 1, 0),
 			Name = "test",
 		})
-		local InnerFrame_TopGradient_Gradient = utility:RenderObject("Frame", {
-			BackgroundColor3 = Window.Accent,
-			BackgroundTransparency = 0,
-			BorderColor3 = Color3.fromRGB(0, 0, 0),
-			BorderSizePixel = 0,
-			Parent = InnerBorder_InnerFrame_TopGradient,
-			Position = UDim2.new(0, 1, 0, 1),
-			Size = UDim2.new(1, -2, 1, -2),
-			Name = game.HttpService:GenerateGUID(false),
-		})
-		
-		local InnerFrame_TopGradient_Gradient2 = utility:RenderObject("ImageLabel", {
-			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-			BackgroundTransparency = 1,
-			BorderColor3 = Color3.fromRGB(0, 0, 0),
-			BorderSizePixel = 0,
-			AnchorPoint= Vector2.new(0.5,0.5),
-			Parent = InnerFrame_TopGradient_Gradient,
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = UDim2.new(1,0,3,0),
-			Image = "rbxassetid://135021825022643",--1316045217 gradik
-			ImageColor3 = Window.Accent,
-			ImageTransparency = 0.6,
-			ZIndex= 2,
-			Name = "priv",
-		})
-		
+
 		local Pages_InnerBorder_InnerFrame = utility:RenderObject("Frame", {
 			BackgroundColor3 = Color3.fromRGB(20, 20, 20),
 			BackgroundTransparency = 0,
@@ -541,22 +507,10 @@ function library:CreateWindow(Properties)
 			Parent = Pages_InnerBorder_InnerFrame,
 			Name = game.HttpService:GenerateGUID(false),
 		})
-
-		
-		local Resize = utility:RenderObject("Frame", {
-			BackgroundColor3 = Color3.fromRGB(20, 20, 20),
-			BackgroundTransparency = 1,
-			ZIndex= 2,
-			BorderColor3 = Color3.fromRGB(0, 0, 0),
-			BorderSizePixel = 0,
-			AnchorPoint = Vector2.new(1,1),
-			Parent = ScreenGui_MainFrame,
-			Position = UDim2.new(1,0,1,0),
-			Size = UDim2.new(0,100,0,100),
-			Name = game.HttpService:GenerateGUID(false),
-		})
 		-----
-		
+		rn.RenderStepped:Connect(function()
+			ScreenGui_MainFrame.BorderColor3 = Color3.fromRGB(35,35,35) --Window.Accent
+		end)
 		-----
 		--
 		do -- // Functions
@@ -568,7 +522,7 @@ function library:CreateWindow(Properties)
 				end
 			end
 			--
-			
+
 			--
 			function Window:Unload()
 				ScreenGui:Remove()
@@ -591,7 +545,8 @@ function library:CreateWindow(Properties)
 			utility:CreateConnection(uis.InputBegan, function(Input)
 
 				if Input.KeyCode and Input.KeyCode == Window.Key or Input.KeyCode == Enum.KeyCode.Insert then
-
+					tws:Create(blur, TweenInfo.new(0.1, Enum.EasingStyle.Sine), {Size = Window.Enabled == false and 56 or 0}):Play()
+					tws:Create(CanvasGGGroup, TweenInfo.new(0.1, Enum.EasingStyle.Sine), {BackgroundTransparency = Window.Background and 0.5 or 1}):Play()
 					Window.Enabled = not Window.Enabled
 					ResizeButton.Modal = Window.Enabled
 					candrag = Window.Enabled
@@ -603,13 +558,12 @@ function library:CreateWindow(Properties)
 	--
 	return setmetatable(Window, library)
 end
---
+
 function library:CreatePage(Properties)
 	Properties = Properties or {}
 	--
 	local Page = {
-		Image = (Properties.image or Properties.Image or Properties.icon or Properties.Icon),
-		Image2 = (Properties.image or Properties.Image or Properties.glow or Properties.Glow),
+		Name = (Properties.name or Properties.Name or Properties.title or Properties.Title or "New Section"),
 		Size = (Properties.size or Properties.Size or UDim2.new(0, 55, 0, 55)),
 		Open = false,
 		Window = self
@@ -617,12 +571,13 @@ function library:CreatePage(Properties)
 	--
 	do
 		local Page_Tab = utility:RenderObject("Frame", {
-			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-			BackgroundTransparency = 1,
-			BorderColor3 = Color3.fromRGB(0, 0, 0),
-			BorderSizePixel = 0,
+			BackgroundColor3 = Color3.fromRGB(23,23,23),
+			BackgroundTransparency = 0,
+			BorderColor3 = Color3.fromRGB(60, 60, 60),
+			BorderSizePixel = 1,
 			Parent = Page.Window["TabsHolder"],
-			Size = UDim2.new(0, 72, 1, 0)
+			Size = UDim2.new(0, 185, 1, 0),
+			ZIndex= 25,
 		})
 		-- //
 		local Page_Tab_Border = utility:RenderObject("Frame", {
@@ -633,42 +588,10 @@ function library:CreatePage(Properties)
 			Parent = Page_Tab,
 			Size = UDim2.new(1, 0, 1, 0),
 			Visible = false,
-			ZIndex = 2,
+			ZIndex= 25,
 			RenderTime = 0.15
 		})
 		--
-		local Page_Tab_Image = utility:RenderObject("ImageLabel", {
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-			BackgroundTransparency = 1,
-			BorderColor3 = Color3.fromRGB(0, 0, 0),
-			BorderSizePixel = 0,
-			Parent = Page_Tab,
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = Page.Size,
-			ZIndex = 2,
-			Image = Page.Image,
-			ImageColor3 = Color3.fromRGB(220, 220, 220)
-		})
-		local Page_Tab_ImageGlow = utility:RenderObject("ImageLabel", {
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-			BackgroundTransparency = 1,
-			BorderColor3 = Color3.fromRGB(0, 0, 0),
-			BorderSizePixel = 0,
-			Parent = Page_Tab_Image,
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = Page.Size,
-			ZIndex = 1,
-			Name= game.HttpService:GenerateGUID(false),
-			ImageTransparency = 0.5,
-			Image = Page.Image2,
-			ImageColor3 = Color3.fromRGB(220, 220, 220)
-		})
-		if Page_Tab_ImageGlow.Image== "rbxassetid://127240918083300" then
-			Page_Tab_ImageGlow.Size = UDim2.new(0,60,0,60)
-			Page_Tab_Image.Size = UDim2.new(0,60,0,60)
-		end
 		--
 		local Page_Tab_Button = utility:RenderObject("TextButton", {
 			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
@@ -677,15 +600,20 @@ function library:CreatePage(Properties)
 			BorderSizePixel = 0,
 			Parent = Page_Tab,
 			Size = UDim2.new(1, 0, 1, 0),
-			Text = ""
-			
+			Text = Page.Name,
+			TextTransparency = 0,
+			TextColor3 = Color3.fromRGB(235, 235, 235),
+			FontFace = Font.fromId(11598121416),
+			TextSize = 15,
+			ZIndex= 25,
+
 		})
 		-- //
-		
+
 		-- //
-		
+
 		--
-		
+
 		-- //
 		local Page_Page = utility:RenderObject("Frame", {
 			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
@@ -746,14 +674,12 @@ function library:CreatePage(Properties)
 				--
 				Page_Page.Visible = Page.Open
 				Page_Tab_Border.Visible = Page.Open
-				
-				Page_Tab_Image.ImageColor3 = Page.Open and Color3.fromRGB(255, 88, 91) or Color3.fromRGB(220, 220, 220)
-				Page_Tab_ImageGlow.ImageColor3 = Page.Open and Color3.fromRGB(255, 88, 91) or Color3.fromRGB(220, 220, 220)
+
 				--
 				if Page.Open then
 					Page.Window:SetPage(Page)
 				end
-				
+
 			end
 		end
 		--
@@ -765,13 +691,16 @@ function library:CreatePage(Properties)
 			end)
 			--
 			utility:CreateConnection(Page_Tab_Button.MouseEnter, function(Input)
-				Page_Tab_Image.ImageColor3 = Color3.fromRGB(255, 88, 91)
-				Page_Tab_ImageGlow.ImageColor3 = Color3.fromRGB(255, 88, 91)
+				if library.Enabled == true then
+					
+					
+				end
 			end)
 			--
 			utility:CreateConnection(Page_Tab_Button.MouseLeave, function(Input)
-				Page_Tab_Image.ImageColor3 = Page.Open and Color3.fromRGB(255, 88, 91) or Color3.fromRGB(220, 220, 220)
-				Page_Tab_ImageGlow.ImageColor3 = Page.Open and Color3.fromRGB(255, 88, 91) or Color3.fromRGB(220, 220, 220)
+				if library.Enabled == true then
+
+				end
 			end)
 		end
 	end
@@ -796,22 +725,22 @@ function pages:CreateSection(Properties)
 	do
 		local scaledSize 
 		local Section_Holder
-		
+
 		local function offsetToScale(frame)
 			local parentSize = frame.Parent.Size
 			local offsetSize = frame.Size
-			
+
 			local parentWidth = parentSize.X.Scale * frame.Parent.AbsoluteSize.X + parentSize.X.Offset
 			local parentHeight = parentSize.Y.Scale * frame.Parent.AbsoluteSize.Y + parentSize.Y.Offset
 
 			local scaleX = offsetSize.X.Offset / parentWidth
 			local scaleY = offsetSize.Y.Offset / parentHeight
-			
+
 			frame.Size = UDim2.new(1, 0, scaleY, 0)
 		end
-		
-		
-		 Section_Holder = utility:RenderObject("Frame", {
+
+
+		Section_Holder = utility:RenderObject("Frame", {
 			BackgroundColor3 = Color3.fromRGB(40, 40, 40),
 			BackgroundTransparency = 0,
 			BorderColor3 = Color3.fromRGB(12, 12, 12),
@@ -821,8 +750,8 @@ function pages:CreateSection(Properties)
 			Size = UDim2.new(1, 0, 0, Section.Size),
 			ZIndex = 2
 		})
-		
-		
+
+
 		offsetToScale(Section_Holder)
 		-- //
 		local Section_Holder_Extra = utility:RenderObject("Frame", {
@@ -1200,7 +1129,7 @@ do -- // Content
 				function Content:SetVisibility()
 					Content_Holder.Visible = not Content_Holder.Visible
 				end
-				
+
 				function Content:Set(state)
 					Content.State = state
 					--
@@ -1429,11 +1358,11 @@ do -- // Content
 			})
 			--
 			do -- // Functions
-				
+
 				function Content:SetVisibility()
 					Content_Holder.Visible = not Content_Holder.Visible
 				end
-				
+
 				function Content:Set(state)
 					Content.State = math.clamp(math.round(state * Content.Decimals) / Content.Decimals, Content.Min, Content.Max)
 					--
@@ -1447,7 +1376,7 @@ do -- // Content
 					local Mouse = utility:MouseLocation()
 					--
 					Outline_Frame_Slider.BackgroundColor3= Content.Window.Accent
-					
+
 					Content:Set(math.clamp(math.floor((Content.Min + (Content.Max - Content.Min) * math.clamp(Mouse.X - Outline_Frame_Slider.AbsolutePosition.X, 0, Holder_Outline_Frame.AbsoluteSize.X) / Holder_Outline_Frame.AbsoluteSize.X) * Content.Decimals) / Content.Decimals, Content.Min, Content.Max))
 				end
 				--
@@ -1525,7 +1454,7 @@ do -- // Content
 				ZIndex = 3
 			})
 			-- //
-			
+
 			local Content_Holder_Outline = utility:RenderObject("Frame", {
 				BackgroundColor3 = Color3.fromRGB(12, 12, 12),
 				BackgroundTransparency = 0,
@@ -1543,7 +1472,7 @@ do -- // Content
 				Content_Holder_Outline.Position= UDim2.new(0, 40, 0, 15) 
 				Content_Holder.Size = UDim2.new(1,0,0,39)
 			end
-			
+
 			--
 			local Content_Holder_Title = utility:RenderObject("TextLabel", {
 				AnchorPoint = Vector2.new(0, 0),
@@ -1663,7 +1592,7 @@ do -- // Content
 			})
 			--
 			do -- // Functions
-				
+
 				function Content:SetVisibility()
 					Content_Holder.Visible = not Content_Holder.Visible
 				end
@@ -1736,7 +1665,7 @@ do -- // Content
 							Size = UDim2.new(1, 0, 1 / #Content.Options, 0),
 							ZIndex = 6
 						})
-						
+
 						-- //
 						local Frame_Option_Title = utility:RenderObject("TextLabel", {
 							BackgroundColor3 = Color3.fromRGB(0, 0, 0),
@@ -1813,7 +1742,7 @@ do -- // Content
 					end
 					--
 					do -- // Functions
-						
+
 						function Content.Content:Close()
 							Content.Content.Open = false
 							--
@@ -2062,11 +1991,11 @@ do -- // Content
 			})
 			--
 			do -- // Functions
-				
+
 				function Content:SetVisibility()
 					Content_Holder.Visible = not Content_Holder.Visible
 				end
-				
+
 				function Content:Set(state)
 					table.sort(state)
 					Content.State = state
@@ -2076,7 +2005,7 @@ do -- // Content
 					Serialised = Serialised == "" and "-" or Serialised
 					--
 					if Content.Options[Content.State[1]] then
-					local Serialised2 = Content.Options[Content.State[1]].."..."
+						local Serialised2 = Content.Options[Content.State[1]].."..."
 						Outline_Frame_Title.Text = Serialised2
 						Outline_Frame_Title2.Text = Serialised2
 					else
@@ -2195,7 +2124,7 @@ do -- // Content
 							Text = "",
 							ZIndex = 6
 						})
-						
+
 						game["Run Service"].RenderStepped:Connect(function()
 							task.wait()
 							Frame_Option_Title2.TextColor3 = table.find(Content.State, Index) and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
@@ -2426,11 +2355,11 @@ do -- // Content
 				function Content:SetVisibility()
 					Content_Holder.Visible = not Content_Holder.Visible
 				end
-				
+
 				function Content:Set(state)
 					Content.State = state or {}
 					Content.Active = false
-					
+
 					--
 					if icnachalned == true then
 						Content_Holder_Value.Text = "[" .. (#Content:Get() > 0 and Content:Shorten(Content:Get()[2]) or "-") .. "]"
@@ -2457,8 +2386,13 @@ do -- // Content
 				function Content:Change(Key)
 					if Key.EnumType then
 						if Key.EnumType == Enum.KeyCode or Key.EnumType == Enum.UserInputType then
-							if table.find(Keys.KeyCodes, Key.Name) or table.find(Keys.Inputs, Key.Name) then
+							if table.find(Keys.KeyCodes, Key.Name)  then
 								Content:Set({Key.EnumType == Enum.KeyCode and "KeyCode" or "UserInputType", Key.Name})
+								return true
+							end
+							if table.find(Keys.Inputs, Key.Name) then
+								Content:Set({Key.EnumType  ==  "UserInputType", Enum.UserInputType[Key.Name]})
+							--	local da = Enum.UserInputType.MouseButton2
 								return true
 							end
 						end
@@ -2553,7 +2487,7 @@ do -- // Content
 				Size = UDim2.new(1, 0, 0, 8 + 10),
 				ZIndex = 3
 			})
-			
+
 			-- //
 			local Content_Holder_Outline = utility:RenderObject("Frame", {
 				BackgroundColor3 = Color3.fromRGB(12, 12, 12),
@@ -2565,15 +2499,15 @@ do -- // Content
 				Size = UDim2.new(0, 17, 0, 9),
 				ZIndex = 3
 			})--срусл
-			
-			
-			
+
+
+
 			if Content.Name== "" or Content.Name== " " then
 				Content_Holder_Outline.Position= UDim2.new(1, -38,0, -13) 
 			else
 				Content_Holder_Outline.Position= UDim2.new(1, -38, 0, 4) 
 			end
-			
+
 			--
 			local Content_Holder_Title = utility:RenderObject("TextLabel", {
 				AnchorPoint = Vector2.new(0, 0),
@@ -2659,15 +2593,15 @@ do -- // Content
 			--
 			do -- // Functions
 				local ColorH, ColorS, ColorV = 1, 1, 1
-				
+
 				function Content:SetVisibility()
 					Content_Holder.Visible = not Content_Holder.Visible
 				end
-				
+
 				function Content:SetVisibilityFalse()
 					Content_Holder.Visible = false
 				end
-				
+
 				function Content:SetVisibilityTrue()
 					Content_Holder.Visible = true
 				end
@@ -2759,8 +2693,8 @@ do -- // Content
 						Image= "http://www.roblox.com/asset/?id=42463044",
 						ZIndex = 6
 					})
-					
-					
+
+
 					--
 					local Transparency_Picker_Outline = utility:RenderObject("Frame", {
 						BackgroundColor3 = Color3.fromRGB(12, 12, 12),
@@ -2774,13 +2708,13 @@ do -- // Content
 						Visible= true
 					})
 					-- //
-					
-					
-					
-					
+
+
+
+
 					local ValSat_Picker_Color = utility:RenderObject("ImageLabel", {
 						BackgroundColor3 = Content.PickerColor,
-						
+
 						BackgroundTransparency = 0,
 						BorderColor3 = Color3.fromRGB(0, 0, 0),
 						BorderSizePixel = 1,
@@ -2793,15 +2727,15 @@ do -- // Content
 					local realcolor
 					local function UpdateColorPicker()
 						--print(Color3.fromHSV(ColorH, ColorS, ColorV))
-						
+
 						ValSat_Picker_Color.BackgroundColor3 = Color3.fromHSV(ColorH, 1, 1)
 						Content.PickerColor = Color3.fromHSV(ColorH, 1, 1)
-						
+
 						Holder_Outline_Frame.BackgroundColor3 = Color3.fromHSV(ColorH, ColorS, ColorV)
 						graddd.ImageColor3 = Color3.fromHSV(ColorH, ColorS, ColorV)
 						pcall(Content.Callback,Color3.fromHSV(ColorH, ColorS, ColorV))
 					end
-					
+
 					local CursorPicker = utility:RenderObject("Frame", {
 						BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 						Visible = true,
@@ -2836,7 +2770,7 @@ do -- // Content
 					CursorPicker2.Position = Content.lastpos2
 
 					ValSat_Picker_Color.InputBegan:Connect(
-						
+
 						function(input)
 							if input.UserInputType == Enum.UserInputType.MouseButton1 then
 
@@ -2921,9 +2855,9 @@ do -- // Content
 							--
 							Content.lastpos1 = CursorPicker.Position
 							Content.lastpos2 = CursorPicker2.Position
-							
+
 							Content_Open_Holder:Remove()
-							
+
 							--
 							function Content.Content:Refresh() end
 							--
@@ -2939,7 +2873,7 @@ do -- // Content
 					Content.Section.Content = Content.Content
 					--
 					do -- // Connections
-						
+
 					end
 				end
 			end
@@ -2947,7 +2881,7 @@ do -- // Content
 			do -- // Connections
 				utility:CreateConnection(Content_Holder_Button.MouseButton1Click, function(Input)
 					if Content.Content.Open then
-						
+
 						Content.Section:CloseContent()
 					else
 						Content:Open()
@@ -3054,6 +2988,9 @@ do -- // Content
 			})
 			--
 			do -- // Connections
+				function Content:SetVisibility()
+					Content_Holder.Visible = not Content_Holder.Visible
+				end
 				utility:CreateConnection(Content_Holder_Button.MouseButton1Click, function()
 					Content.Callback()
 				end)
@@ -3068,11 +3005,15 @@ do -- // Content
 			end
 		end
 		--
+		
 		return Content
 	end
 end
 
 local playerTime = getCurrentTime()
+print("library has loaded ".. playerTime)
+
+local playerTime = getCurrentTime()
 print("library has started ".. playerTime)
+
 return library
--- 
