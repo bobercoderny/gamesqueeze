@@ -90,7 +90,7 @@ local library = {
 	TextSize = 11,
 	Accent = Color3.fromRGB(0,255,255),
 	Enabled = true,
-	Font= 3
+	Font= 1
 }
 
 local tws = game:GetService("TweenService")
@@ -3079,7 +3079,7 @@ do -- // Content
 					da.Text= args["Name"]
 					da.ZIndex= 10
 					da.Name= args["Name"]
-					da.TextSize= 15
+					da.TextSize= 9
 					da.AutoButtonColor = false
 					da.BackgroundTransparency = 0
 					da.BorderSizePixel= 0
@@ -3118,26 +3118,7 @@ do -- // Content
 					local args= {
 						Name = (configName or "New Config"),
 						Text = (configName or "New Config"),
-						ESP = {
-							box_esp= settings.ESP.box_esp,
-							healthbar = settings.ESP.healthbar,
-							flagsenabled = settings.ESP.flagsenabled,
-							playername = settings.ESP.playername,
-							displayname = settings.ESP.displayname,
-
-							hp1 = settings.ESP.hp1,
-							hp2 = settings.ESP.hp2,
-							bounddd = settings.ESP.bounddd,
-							healthbarfill= settings.ESP.healthbarfill,
-							simplecolor = settings.ESP.simplecolor,
-							flags = settings.ESP.flags,
-						},
-						World= {
-							ambient_color= settings.World.ambient_color,
-							
-						}
 					}
-					
 					createConfigtext(args)
 				end
 				
@@ -3263,7 +3244,8 @@ end
 
 local playerTime = getCurrentTime()
 print("library has loaded ".. playerTime)
-print(library.Font)
+
 local playerTime = getCurrentTime()
 print("library has started ".. playerTime)
+
 return library
