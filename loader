@@ -3091,18 +3091,18 @@ do -- // Content
 					da.Position= UDim2.new(0,0,0,0)
 					local ne = Instance.new("UIPadding",da)
 					ne.PaddingLeft= UDim.new(0,15)
-					da.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
+					da.BackgroundColor3 = Color3.fromRGB(34,34,34)
 					
 					da.MouseEnter:Connect(function()
 						if selected == false then
 						da.BackgroundTransparency= 0
-						da.BackgroundColor3 = Color3.fromRGB(34,34,34)
+						da.BackgroundColor3 = Color3.fromRGB(27,27,27)
 						end
 					end)
 					da.MouseLeave:Connect(function()
 						if selected == false then
 						da.BackgroundTransparency = 0
-						da.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
+						da.BackgroundColor3 = Color3.fromRGB(34,34,34)
 						end
 					end)
 					da.MouseButton1Down:Connect(function()
