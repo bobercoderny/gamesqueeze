@@ -2907,7 +2907,7 @@ do -- // Content
 		--
 		local Content = {
 			Name = (Properties.name or Properties.Name or Properties.title or Properties.Title or "New Button"),
-			Callback = (Properties.callback or Properties.Callback or function() end),
+			Callback = (Properties.callback or Properties.Callback or function() end),Callback2 = (Properties.callback2 or Properties.Callback2 or function() end),
 			Window = self.Window,
 			Page = self.Page,
 			Section = self,
@@ -3035,7 +3035,7 @@ do -- // Content
 							
 						}
 					}
-					
+					Content.Callback2(args["Name"])
 					createConfigtext(args)
 				end
 				
