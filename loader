@@ -29,6 +29,59 @@ local dropdown = section:CreateDropdown({
 
 ]]
 
+local fonts = {
+	{ ttf = "Proggy.ttf", json = "Proggy.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Proggy.txt", name = "Proggy" },
+	{ ttf = "Minecraftia.ttf", json = "Minecraftia.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Minecraftia.txt", name = "Minecraftia" },
+	{ ttf = "SmallestPixel7.ttf", json = "SmallestPixel7.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Smallest%20Pixel.txt", name = "SmallestPixel7" },
+	{ ttf = "Verdana.ttf", json = "Verdana.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Verdana.txt", name = "Verdana" },
+	{ ttf = "VerdanaBold.ttf", json = "VerdanaBold.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Verdana%20Bold.txt", name = "VerdanaBold" },
+	{ ttf = "Tahoma.ttf", json = "Tahoma.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Tahoma.txt", name = "Tahoma" },
+	{ ttf = "TahomaBold.ttf", json = "TahomaBold.json", url = "https://raw.githubusercontent.com/OxygenClub/Random-LUAS/main/Tahoma%20Bold.txt", name = "TahomaBold" }
+}
+
+
+if not game["Run Service"]:IsStudio() then
+	for _, font in fonts do
+		if not isfile(font.ttf) then
+			writefile(font.ttf, base64_decode(game:HttpGet(font.url)))
+		end
+
+		if not isfile(font.json) then
+			local fontConfig = {
+				name = font.name,
+				faces = {
+					{
+						name = "Regular",
+						weight = 200,
+						style = "normal",
+						assetId = getcustomasset(font.ttf)
+					}
+				}
+			}
+			writefile(font.json, game.HttpService:JSONEncode(fontConfig))
+		end
+	end
+end
+if not game["Run Service"]:IsStudio() then
+	local DrawingFontsEnum = {
+		[0] = Font.new(getcustomasset("Verdana.json"), Enum.FontWeight.Regular),
+		[1] = Font.new(getcustomasset("SmallestPixel7.json"), Enum.FontWeight.Regular),
+		[2] = Font.new(getcustomasset("Proggy.json"), Enum.FontWeight.Regular),
+		[3] = Font.new(getcustomasset("Minecraftia.json"), Enum.FontWeight.Regular),
+		[4] = Font.new(getcustomasset("VerdanaBold.json"), Enum.FontWeight.Regular),
+		[5] = Font.new(getcustomasset("Tahoma.json"), Enum.FontWeight.Regular),
+		[6] = Font.new(getcustomasset("TahomaBold.json"), Enum.FontWeight.Regular),
+	}
+end
+
+function GetFontFromIndex(fontIndex)
+	if not game["Run Service"]:IsStudio() then
+		return DrawingFontsEnum[fontIndex]
+	else
+		return Font.new("Incosolata")
+	end
+end
+
 local library = {
 	Renders = {},
 	Connections = {},
@@ -36,6 +89,7 @@ local library = {
 	TextSize = 11,
 	Accent = Color3.fromRGB(0,255,255),
 	Enabled = true,
+	Font= 1,
 }
 
 local tws = game:GetService("TweenService")
@@ -394,7 +448,7 @@ function library:CreateWindow(Properties)
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			Size = UDim2.new(1, 0, 0, 0),
 			ZIndex = 9,
-			FontFace = Font.fromId(11598121416),
+			FontFace =GetFontFromIndex(library.Font),
 			RichText = true,
 			Text = "liquidware",
 			TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -603,7 +657,7 @@ function library:CreatePage(Properties)
 			Text = Page.Name,
 			TextTransparency = 0,
 			TextColor3 = Color3.fromRGB(235, 235, 235),
-			FontFace = Font.fromId(11598121416),
+			FontFace =GetFontFromIndex(library.Font),
 			TextSize = 15,
 			ZIndex= 25,
 
@@ -797,7 +851,7 @@ function pages:CreateSection(Properties)
 			Position = UDim2.new(0, 12, 0, 0),
 			Size = UDim2.new(1, -26, 0, 15),
 			ZIndex = 5,
-			FontFace = Font.fromId(11598121416),
+			FontFace =GetFontFromIndex(library.Font),
 			RichText = true,
 			Text = "<b>" .. Section.Name .. "</b>",
 			TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -939,7 +993,7 @@ function pages:CreateSection(Properties)
 			Parent = Holder_Frame_ContentHolder,
 			FillDirection = "Vertical",
 			HorizontalAlignment = "Center",
-			VerticalAlignment = "Top"
+			VerticalAlignment = "Top",SortOrder= "LayoutOrder"
 		})
 		--
 		local Frame_ContentHolder_Padding = utility:RenderObject("UIPadding", {
@@ -1048,7 +1102,7 @@ do -- // Content
 				Position = UDim2.new(0, 41, 0, 0),
 				Size = UDim2.new(1, -41, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = Content.Name,
 				TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -1067,7 +1121,7 @@ do -- // Content
 				Position = UDim2.new(0, 41, 0, 0),
 				Size = UDim2.new(1, -41, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = Content.Name,
 				TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -1221,7 +1275,7 @@ do -- // Content
 					Position = UDim2.new(0, 41, 0, 4),
 					Size = UDim2.new(1, -41, 0, 10),
 					ZIndex = 3,
-					FontFace = Font.fromId(11598121416),
+					FontFace =GetFontFromIndex(library.Font),
 					RichText = true,
 					Text = Content.Name,
 					TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -1240,7 +1294,7 @@ do -- // Content
 					Position = UDim2.new(0, 41, 0, 4),
 					Size = UDim2.new(1, -41, 0, 10),
 					ZIndex = 3,
-					FontFace = Font.fromId(11598121416),
+					FontFace =GetFontFromIndex(library.Font),
 					RichText = true,
 					Text = Content.Name,
 					TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -1326,7 +1380,7 @@ do -- // Content
 				Position = UDim2.new(1, 0, 0.5, 1),
 				Size = UDim2.new(0, 2, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = "",
 				TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -1346,7 +1400,7 @@ do -- // Content
 				Position = UDim2.new(1, 0, 0.5, 1),
 				Size = UDim2.new(0, 2, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = "",
 				TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -1484,7 +1538,7 @@ do -- // Content
 				Position = UDim2.new(0, 41, 0, 4),
 				Size = UDim2.new(1, -41, 0, 10),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = Content.Name,
 				TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -1503,7 +1557,7 @@ do -- // Content
 				Position = UDim2.new(0, 41, 0, 4),
 				Size = UDim2.new(1, -41, 0, 10),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = Content.Name,
 				TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -1550,7 +1604,7 @@ do -- // Content
 				Position = UDim2.new(0, 8, 0, 0),
 				Size = UDim2.new(1, 0, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = "",
 				TextColor3 = Color3.fromRGB(155, 155, 155),
@@ -1568,7 +1622,7 @@ do -- // Content
 				Position = UDim2.new(0, 8, 0, 0),
 				Size = UDim2.new(1, 0, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = "",
 				TextColor3 = Color3.fromRGB(155, 155, 155),
@@ -1676,7 +1730,7 @@ do -- // Content
 							Position = UDim2.new(0, 8, 0, 0),
 							Size = UDim2.new(1, 0, 1, 0),
 							ZIndex = 6,
-							FontFace = Font.fromId(11598121416),
+							FontFace =GetFontFromIndex(library.Font),
 							RichText = true,
 							Text = tostring(Option),
 							TextColor3 = Index == Content.State and Content.Window.Accent or Color3.fromRGB(205, 205, 205),
@@ -1694,7 +1748,7 @@ do -- // Content
 							Position = UDim2.new(0, 8, 0, 0),
 							Size = UDim2.new(1, 0, 1, 0),
 							ZIndex = 6,
-							FontFace = Font.fromId(11598121416),
+							FontFace =GetFontFromIndex(library.Font),
 							RichText = true,
 							Text = tostring(Option),
 							TextColor3 = Index == Content.State and Content.Window.Accent or Color3.fromRGB(205, 205, 205),
@@ -1883,7 +1937,7 @@ do -- // Content
 				Position = UDim2.new(0, 41, 0, 4),
 				Size = UDim2.new(1, -41, 0, 10),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = Content.Name,
 				TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -1902,7 +1956,7 @@ do -- // Content
 				Position = UDim2.new(0, 41, 0, 4),
 				Size = UDim2.new(1, -41, 0, 10),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = Content.Name,
 				TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -1949,7 +2003,7 @@ do -- // Content
 				Position = UDim2.new(0, 8, 0, 0),
 				Size = UDim2.new(1, 0, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = "",
 				TextColor3 = Color3.fromRGB(155, 155, 155),
@@ -1967,7 +2021,7 @@ do -- // Content
 				Position = UDim2.new(0, 8, 0, 0),
 				Size = UDim2.new(1, 0, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = "",
 				TextColor3 = Color3.fromRGB(155, 155, 155),
@@ -2086,7 +2140,7 @@ do -- // Content
 							Position = UDim2.new(0, 8, 0, 0),
 							Size = UDim2.new(1, 0, 1, 0),
 							ZIndex = 6,
-							FontFace = Font.fromId(11598121416),
+							FontFace =GetFontFromIndex(library.Font),
 							RichText = true,
 							Text = tostring(Option),
 							TextColor3 = table.find(Content.State, Index) and Content.Window.Accent or Color3.fromRGB(205, 205, 205),
@@ -2104,7 +2158,7 @@ do -- // Content
 							Position = UDim2.new(0, 8, 0, 0),
 							Size = UDim2.new(1, 0, 1, 0),
 							ZIndex = 6,
-							FontFace = Font.fromId(11598121416),
+							FontFace =GetFontFromIndex(library.Font),
 							RichText = true,
 							Text = tostring(Option),
 							TextColor3 = table.find(Content.State, Index) and Content.Window.Accent or Color3.fromRGB(205, 205, 205),
@@ -2291,7 +2345,7 @@ do -- // Content
 				Position = UDim2.new(0, 41, 0, 0),
 				Size = UDim2.new(1, -41, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = Content.Name,
 				TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -2310,7 +2364,7 @@ do -- // Content
 				Position = UDim2.new(0, 41, 0, 0),
 				Size = UDim2.new(1, -41, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = Content.Name,
 				TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -2340,7 +2394,7 @@ do -- // Content
 				Position = UDim2.new(0, 41, 0, 0),
 				Size = UDim2.new(1, -61, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text =  "["..Content.Iznachalno.."]",
 				TextColor3 = Color3.fromRGB(114, 114, 114),
@@ -2519,7 +2573,7 @@ do -- // Content
 				Position = UDim2.new(0, 41, 0, 0),
 				Size = UDim2.new(1, -41, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = Content.Name,
 				TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -2538,7 +2592,7 @@ do -- // Content
 				Position = UDim2.new(0, 41, 0, 0),
 				Size = UDim2.new(1, -41, 1, 0),
 				ZIndex = 3,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = Content.Name,
 				TextColor3 = Color3.fromRGB(205, 205, 205),
@@ -2924,14 +2978,59 @@ do -- // Content
 				Size = UDim2.new(1, 0, 0, 100),
 				ZIndex = 3,Name= "holder"
 			})
-			local Content_Holder_Outline = utility:RenderObject("ScrollingFrame", {
-				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-				BackgroundTransparency = 1,
+			local textbox = utility:RenderObject("TextBox", {
+				BackgroundColor3 = Color3.fromRGB(36, 36, 36),
+				BackgroundTransparency = 0,
 				BorderColor3 = Color3.fromRGB(0, 0, 0),
-				BorderSizePixel = 0,
+				BorderSizePixel = 1,
 				Parent = Content_Holder,
-				Position = UDim2.new(0, 40, 0, 15),
-				Size = UDim2.new(1, -98, 1, 0),
+				Size = UDim2.new(1, -100, 0.20, -2),
+				Position= UDim2.new(0,41,0,3),
+				Text= "",TextScaled = true,
+				PlaceholderText= "config name",
+				PlaceholderColor3= Color3.fromRGB(155, 155, 155),
+				TextColor3 = Color3.fromRGB(155, 155, 155),
+				ZIndex = 999,Name= "bbbb",
+				TextXAlignment ="Left",
+				ClearTextOnFocus = false,
+				FontFace=GetFontFromIndex(library.Font)
+			})
+			local nett = Instance.new("UIPadding",textbox)
+			nett.PaddingLeft= UDim.new(0,15)
+			nett.PaddingTop= UDim.new(0,1)
+			nett.PaddingBottom= UDim.new(0,1)
+			local textBox = textbox
+
+			textBox:GetPropertyChangedSignal("Text"):Connect(function()
+				local inputText = textBox.Text
+				local filteredText = ""
+
+				for i = 1, #inputText do
+					local char = inputText:sub(i, i)
+					if char:match("%a") then
+						filteredText = filteredText .. char
+					end
+				end
+
+				if #filteredText > 25 then
+					filteredText = filteredText:sub(1, 25)
+				end
+				if textbox.Text == "" then
+					filteredText = ""
+				else
+					textBox.Text = filteredText .."_"
+				end
+				Content.Callback2(filteredText) 
+			end)
+			
+			local Content_Holder_Outline = utility:RenderObject("ScrollingFrame", {
+				BackgroundColor3 = Color3.fromRGB(36, 36, 36),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 1,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 41, 0, 20),
+				Size = UDim2.new(1, -100, 1, -25),
 				ZIndex = 4,
 				AutomaticCanvasSize = "Y",
 				BottomImage = "rbxassetid://7783554086",
@@ -2950,8 +3049,8 @@ do -- // Content
 				BorderColor3 = Color3.fromRGB(0, 0, 0),
 				BorderSizePixel = 0,
 				Parent = Content_Holder_Outline,
-				Position = UDim2.new(0, 1, 0, 1),
-				Size = UDim2.new(1, -2, 1, -2),
+				Position = UDim2.new(0,0,0,0),
+				Size = UDim2.new(1,0,1,0),
 				ZIndex = 3
 			})
 			-- //
@@ -2965,7 +3064,7 @@ do -- // Content
 				Parent = Holder_Outline_Frame,
 				FillDirection= "Vertical",
 				Padding= UDim.new(0,0),
-				VerticalAlignment = "Top"
+				VerticalAlignment = "Top",
 			})
 			local ne = Instance.new("UIPadding",list)
 			ne.PaddingTop= UDim.new(0,15)
@@ -2986,7 +3085,7 @@ do -- // Content
 					da.TextTransparency= 0
 					da.TextColor3= Color3.fromRGB(155, 155, 155)
 					da.TextXAlignment= "Left"
-					da.FontFace= Font.fromId(11598121416)
+					da.FontFace=GetFontFromIndex(library.Font)
 					da.Size= UDim2.new(1,0,0.20,0)
 					da.Position= UDim2.new(0,0,0,0)
 					local ne = Instance.new("UIPadding",da)
@@ -3013,6 +3112,7 @@ do -- // Content
 					end)
 
 				end
+				
 				function Content:CreateConfig(configName,settings)
 					local args= {
 						Name = (configName or "New Config"),
@@ -3101,7 +3201,7 @@ do -- // Content
 				Position = UDim2.new(0, 8, 0, 0),
 				Size = UDim2.new(1, 0, 1, 0),
 				ZIndex = 9,
-				FontFace = Font.fromId(11598121416),
+				FontFace =GetFontFromIndex(library.Font),
 				RichText = true,
 				Text = Content.Name,
 				TextColor3 = Color3.fromRGB(155, 155, 155),
