@@ -3266,5 +3266,5 @@ print("library has loaded ".. playerTime)
 
 local playerTime = getCurrentTime()
 print("library has started ".. playerTime)
-
+print(library.Font)
 return library
