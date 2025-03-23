@@ -90,7 +90,7 @@ local library = {
 	TextSize = 11,
 	Accent = Color3.fromRGB(0,255,255),
 	Enabled = true,
-	Font= 0
+	Font= 1
 }
 
 local tws = game:GetService("TweenService")
@@ -3263,7 +3263,6 @@ end
 
 local playerTime = getCurrentTime()
 print("library has loaded ".. playerTime)
-print("font:"..library.Font)
 
 local playerTime = getCurrentTime()
 print("library has started ".. playerTime)
