@@ -90,7 +90,7 @@ local library = {
 	TextSize = 11,
 	Accent = Color3.fromRGB(0,255,255),
 	Enabled = true,
-	Font= 3,
+	Font= 0
 }
 
 local tws = game:GetService("TweenService")
@@ -462,7 +462,6 @@ function library:CreateWindow(Properties)
 			Shadow.Visible = Window.Shadow
 			blur.Enabled = Window.Blur
 			CanvasGGGroup.Visible = Window.Background
-			Section_Holder_Title.FontFace =GetFontFromIndex(library.Font)
 		end)
 		
 		task.spawn(function()
@@ -740,9 +739,6 @@ function library:CreatePage(Properties)
 		end
 		--
 		do -- // Connections
-			rn.RenderStepped:Connect(function()
-				Page_Tab_Button.FontFace= GetFontFromIndex(library.Font)
-			end)
 			utility:CreateConnection(Page_Tab_Button.MouseButton1Click, function(Input)
 				if not Page.Open then
 					Page:Set(true)
@@ -1027,9 +1023,6 @@ function pages:CreateSection(Properties)
 		end
 		--
 		do -- // Connections
-			rn.RenderStepped:Connect(function()
-				Section_Holder_Title.FontFace = GetFontFromIndex(library.Font)
-			end)
 			utility:CreateConnection(Holder_Frame_ContentHolder:GetPropertyChangedSignal("AbsoluteCanvasSize"), function()
 				Holder_Extra_Gradient1.Visible = Holder_Frame_ContentHolder.AbsoluteCanvasSize.Y > Holder_Frame_ContentHolder.AbsoluteWindowSize.Y
 				Holder_Extra_Gradient2.Visible = Holder_Frame_ContentHolder.AbsoluteCanvasSize.Y > Holder_Frame_ContentHolder.AbsoluteWindowSize.Y
@@ -1183,8 +1176,6 @@ do -- // Content
 			})
 			game["Run Service"].RenderStepped:Connect(function()
 				task.wait()
-				Content_Holder_Title2.FontFace= GetFontFromIndex(library.Font)
-				Content_Holder_Title.FontFace= GetFontFromIndex(library.Font)
 				Holder_Outline_Frame.BackgroundColor3 = Content.State and Content.Window.Accent or Color3.fromRGB(77, 77, 77)
 				graddd.ImageColor3 = Content.State and Content.Window.Accent or Color3.fromRGB(77, 77, 77)
 			end)
@@ -1313,12 +1304,6 @@ do -- // Content
 					TextTransparency = 0.5,
 					TextXAlignment = "Left"
 				})
-				game["Run Service"].RenderStepped:Connect(function()
-					task.wait()
-					--Outline_Frame_Slider.BackgroundColor3 = Content.Window.Accent
-					Content_Holder_Title.FontFace= GetFontFromIndex(library.Font)
-					Content_Holder_Title2.FontFace= GetFontFromIndex(library.Font)
-				end)
 			end
 			--
 			local Content_Holder_Button = utility:RenderObject("TextButton", {
@@ -1341,7 +1326,6 @@ do -- // Content
 				Size = UDim2.new(1, -2, 1, -2),
 				ZIndex = 3
 			})
-			
 			-- //
 			local Outline_Frame_Slider = utility:RenderObject("Frame", {
 				BackgroundColor3 = Content.Window.Accent,
@@ -1353,10 +1337,6 @@ do -- // Content
 				Size = UDim2.new(0, 0, 1, 0),
 				ZIndex = 3
 			})
-			game["Run Service"].RenderStepped:Connect(function()
-				task.wait()
-				Outline_Frame_Slider.BackgroundColor3 = Content.Window.Accent
-			end)
 			local graddd = utility:RenderObject("ImageLabel", {
 				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
 				BackgroundTransparency = 1,
@@ -1386,7 +1366,10 @@ do -- // Content
 				Rotation = 90,
 				Parent = Outline_Frame_Slider
 			})
-			
+			game["Run Service"].RenderStepped:Connect(function()
+				task.wait()
+				Outline_Frame_Slider.BackgroundColor3 = Content.Window.Accent
+			end)
 			-- //
 			local Frame_Slider_Title = utility:RenderObject("TextLabel", {
 				AnchorPoint = Vector2.new(0.5, 0),
@@ -1428,11 +1411,6 @@ do -- // Content
 				TextXAlignment = "Center",
 				RenderTime = 0.15
 			})
-			game["Run Service"].RenderStepped:Connect(function()
-				task.wait()
-				Frame_Slider_Title.FontFace = GetFontFromIndex(library.Font)
-				Frame_Slider_Title2.FontFace = GetFontFromIndex(library.Font)
-			end)
 			--
 			do -- // Functions
 
@@ -1668,13 +1646,6 @@ do -- // Content
 				ZIndex = 3
 			})
 			--
-			game["Run Service"].RenderStepped:Connect(function()
-				task.wait()
-				Outline_Frame_Title2.FontFace = GetFontFromIndex(library.Font)
-				Outline_Frame_Title.FontFace = GetFontFromIndex(library.Font)
-				Content_Holder_Title2.FontFace = GetFontFromIndex(library.Font)
-				Content_Holder_Title.FontFace = GetFontFromIndex(library.Font)
-			end)
 			do -- // Functions
 
 				function Content:SetVisibility()
@@ -1802,8 +1773,6 @@ do -- // Content
 							task.wait()
 							Frame_Option_Title2.TextColor3 = Index == Content.State and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
 							Frame_Option_Title.TextColor3 = Index == Content.State and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
-							Frame_Option_Title2.FontFace = GetFontFromIndex(library.Font)
-							Frame_Option_Title.FontFace = GetFontFromIndex(library.Font)
 						end)
 						--
 						do -- // Connections
@@ -2076,13 +2045,6 @@ do -- // Content
 				ZIndex = 3
 			})
 			--
-			game["Run Service"].RenderStepped:Connect(function()
-				Content_Holder_Title.FontFace = GetFontFromIndex(library.Font)
-				Content_Holder_Title2.FontFace = GetFontFromIndex(library.Font)
-				Outline_Frame_Title.FontFace = GetFontFromIndex(library.Font)
-				Outline_Frame_Title2.FontFace = GetFontFromIndex(library.Font)
-				
-			end)
 			do -- // Functions
 
 				function Content:SetVisibility()
@@ -2220,8 +2182,6 @@ do -- // Content
 
 						game["Run Service"].RenderStepped:Connect(function()
 							task.wait()
-							Frame_Option_Title2.FontFace = GetFontFromIndex(library.Font)
-							Frame_Option_Title.FontFace = GetFontFromIndex(library.Font)
 							Frame_Option_Title2.TextColor3 = table.find(Content.State, Index) and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
 							Frame_Option_Title.TextColor3 = table.find(Content.State, Index) and Content.Window.Accent or Color3.fromRGB(205, 205, 205)
 						end)
@@ -2496,11 +2456,6 @@ do -- // Content
 			end
 			--
 			do -- // Connections
-				game["Run Service"].RenderStepped:Connect(function()
-					Content_Holder_Value.FontFace= GetFontFromIndex(library.Font)
-					Content_Holder_Title2.FontFace= GetFontFromIndex(library.Font)
-					Content_Holder_Title.FontFace = GetFontFromIndex(library.Font)
-				end)
 				utility:CreateConnection(Content_Holder_Button.MouseButton1Click, function(Input)
 					Content.Holding = true
 					--
@@ -2691,11 +2646,6 @@ do -- // Content
 				Parent = Holder_Outline_Frame
 			})
 			--
-			game["Run Service"].RenderStepped:Connect(function()
-				Content_Holder_Title2.FontFace= GetFontFromIndex(library.Font)
-				Content_Holder_Title.FontFace= GetFontFromIndex(library.Font)
-				--Content_Holder_Title.FontFace = GetFontFromIndex(library.Font)
-			end)
 			do -- // Functions
 				local ColorH, ColorS, ColorV = 1, 1, 1
 
@@ -3051,11 +3001,7 @@ do -- // Content
 			nett.PaddingTop= UDim.new(0,1)
 			nett.PaddingBottom= UDim.new(0,1)
 			local textBox = textbox
-			game["Run Service"].RenderStepped:Connect(function()
-			--	Content_Holder_Value.FontFace= GetFontFromIndex(library.Font)
-				textbox.FontFace= GetFontFromIndex(library.Font)
-				--Content_Holder_Title.FontFace = GetFontFromIndex(library.Font)
-			end)
+
 			textBox:GetPropertyChangedSignal("Text"):Connect(function()
 				local inputText = textBox.Text
 				local filteredText = ""
@@ -3125,12 +3071,11 @@ do -- // Content
 			ne.PaddingTop= UDim.new(0,15)
 			--
 			do -- // Connections
-				local da
 				local selectedConfig = ""
 				local selected= false
 				local function createConfigtext(args)
 					print(args)
-					da = Instance.new("TextButton",Holder_Outline_Frame)
+					local da = Instance.new("TextButton",Holder_Outline_Frame)
 					da.Text= args["Name"]
 					da.ZIndex= 10
 					da.Name= args["Name"]
@@ -3168,10 +3113,7 @@ do -- // Content
 					end)
 
 				end
-				game["Run Service"].RenderStepped:Connect(function()
-
-					da.FontFace = GetFontFromIndex(library.Font)
-				end)
+				
 				function Content:CreateConfig(configName,settings)
 					local args= {
 						Name = (configName or "New Config"),
@@ -3297,10 +3239,6 @@ do -- // Content
 			})
 			--
 			do -- // Connections
-				game["Run Service"].RenderStepped:Connect(function()
-
-					Outline_Frame_Title.FontFace = GetFontFromIndex(library.Font)
-				end)
 				function Content:SetVisibility()
 					Content_Holder.Visible = not Content_Holder.Visible
 				end
@@ -3325,6 +3263,7 @@ end
 
 local playerTime = getCurrentTime()
 print("library has loaded ".. playerTime)
+print("font:"..library.Font)
 
 local playerTime = getCurrentTime()
 print("library has started ".. playerTime)
