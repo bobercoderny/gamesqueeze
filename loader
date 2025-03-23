@@ -2902,6 +2902,104 @@ do -- // Content
 		--
 		return Content
 	end
+	function sections:CreateConfigList(Properties)
+		Properties = Properties or {}
+		--
+		local Content = {
+			Name = (Properties.name or Properties.Name or Properties.title or Properties.Title or "New Button"),
+			Callback = (Properties.callback or Properties.Callback or function() end),
+			Window = self.Window,
+			Page = self.Page,
+			Section = self,
+			Text= Properties.Text,
+		}
+		--
+		do
+			local Content_Holder = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content.Section.Holder,
+				Size = UDim2.new(1, 0, 0, 100),
+				ZIndex = 3,Name= "holder"
+			})
+			local Content_Holder_Outline = utility:RenderObject("ScrollingFrame", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 1,
+				Parent = Content_Holder,
+				Position = UDim2.new(0, 40, 0, 15),
+				Size = UDim2.new(1, -98, 1, 0),
+				ZIndex = 4,
+				AutomaticCanvasSize = "Y",
+				BottomImage = "rbxassetid://7783554086",
+				CanvasSize = UDim2.new(0, 0, 0, 0),
+				MidImage = "rbxassetid://7783554086",
+				ScrollBarImageColor3 = Color3.fromRGB(65, 65, 65),
+				ScrollBarImageTransparency = 0,
+				ScrollBarThickness = 5,
+				TopImage = "rbxassetid://7783554086",
+				VerticalScrollBarInset = "None"
+			})
+			
+			local Content_Holder_Button = utility:RenderObject("TextButton", {
+				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+				BackgroundTransparency = 1,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder,
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = ""
+			})
+			-- //
+			local Holder_Outline_Frame = utility:RenderObject("Frame", {
+				BackgroundColor3 = Color3.fromRGB(36, 36, 36),
+				BackgroundTransparency = 0,
+				BorderColor3 = Color3.fromRGB(0, 0, 0),
+				BorderSizePixel = 0,
+				Parent = Content_Holder_Outline,
+				Position = UDim2.new(0, 1, 0, 1),
+				Size = UDim2.new(1, -2, 1, -2),
+				ZIndex = 3
+			})
+			-- //
+			local Outline_Frame_Gradient = utility:RenderObject("UIGradient", {
+				Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(220, 220, 220)),
+				Enabled = true,
+				Rotation = 270,
+				Parent = Holder_Outline_Frame
+			})
+			--
+			do -- // Connections
+				function Content:CreateConfig(...)
+					local args = {...}
+					local arg1= args[1]
+					local arg2= args[2]
+					print(arg2)
+				end
+				
+				function Content:SetVisibility()
+					Content_Holder.Visible = not Content_Holder.Visible
+				end
+				utility:CreateConnection(Content_Holder_Button.MouseButton1Click, function()
+					Content.Callback()
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseEnter, function()
+					Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(46, 46, 46)
+				end)
+				--
+				utility:CreateConnection(Content_Holder_Button.MouseLeave, function()
+					Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(36, 36, 36)
+				end)
+			end
+		end
+		--
+
+		return Content
+	end
 	function sections:CreateButton(Properties)
 		Properties = Properties or {}
 		--
@@ -2936,8 +3034,10 @@ do -- // Content
 				ZIndex = 3
 			})
 			--
-			if Content.Text== "" or Content.Text== " " then
+			
+			if Content.Name== "load" or Content.Name== "create" or Content.Name== "unload" or Content.Name== "delete" or Content.Name== "save" then
 				Content_Holder_Outline.Position= UDim2.new(0, 40, 0, 0) 
+				Content_Holder.Size = UDim2.new(1, 0, 0, 26)
 			else
 				Content_Holder_Outline.Position= UDim2.new(0, 40, 0, 15) 
 			end
