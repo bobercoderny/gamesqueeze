@@ -2978,6 +2978,7 @@ do -- // Content
 					local da = Instance.new("TextButton",Holder_Outline_Frame)
 					da.Text= args["Name"]
 					da.ZIndex= 10
+					da.Name= args["Name"]
 					da.TextSize= 15
 					da.AutoButtonColor = false
 					da.BackgroundTransparency = 0
@@ -3035,7 +3036,7 @@ do -- // Content
 							
 						}
 					}
-					Content.Callback2(args["Name"])
+					
 					createConfigtext(args)
 				end
 				
