@@ -2973,11 +2973,8 @@ do -- // Content
 			})
 			--
 			do -- // Connections
-				function Content:CreateConfig(...)
-					local args = {...}
-					local arg1= args[1]
-					local arg2= args[2]
-					print(arg2)
+				function Content:CreateConfig(name)
+					print(name)
 				end
 				
 				function Content:SetVisibility()
