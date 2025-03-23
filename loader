@@ -2928,7 +2928,7 @@ do -- // Content
 				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
 				BackgroundTransparency = 1,
 				BorderColor3 = Color3.fromRGB(0, 0, 0),
-				BorderSizePixel = 1,
+				BorderSizePixel = 0,
 				Parent = Content_Holder,
 				Position = UDim2.new(0, 40, 0, 15),
 				Size = UDim2.new(1, -98, 1, 0),
@@ -2942,16 +2942,6 @@ do -- // Content
 				ScrollBarThickness = 5,
 				TopImage = "rbxassetid://7783554086",
 				VerticalScrollBarInset = "None"
-			})
-			
-			local Content_Holder_Button = utility:RenderObject("TextButton", {
-				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-				BackgroundTransparency = 1,
-				BorderColor3 = Color3.fromRGB(0, 0, 0),
-				BorderSizePixel = 0,
-				Parent = Content_Holder,
-				Size = UDim2.new(1, 0, 1, 0),
-				Text = ""
 			})
 			-- //
 			local Holder_Outline_Frame = utility:RenderObject("Frame", {
@@ -2971,26 +2961,88 @@ do -- // Content
 				Rotation = 270,
 				Parent = Holder_Outline_Frame
 			})
+			local list = utility:RenderObject("UIListLayout", {
+				Parent = Holder_Outline_Frame,
+				FillDirection= "Vertical",
+				Padding= UDim.new(0,0),
+				VerticalAlignment = "Top"
+			})
+			local ne = Instance.new("UIPadding",list)
+			ne.PaddingTop= UDim.new(0,15)
 			--
 			do -- // Connections
-				function Content:CreateConfig(name)
-					print(name)
+				local selectedConfig = ""
+				local selected= false
+				local function createConfigtext(args)
+					print(args)
+					local da = Instance.new("TextButton",Holder_Outline_Frame)
+					da.Text= args["Name"]
+					da.ZIndex= 10
+					da.TextSize= 15
+					da.AutoButtonColor = false
+					da.BackgroundTransparency = 0
+					da.BorderSizePixel= 0
+					da.TextTransparency= 0
+					da.TextColor3= Color3.fromRGB(155, 155, 155)
+					da.TextXAlignment= "Left"
+					da.FontFace= Font.fromId(11598121416)
+					da.Size= UDim2.new(1,0,0.20,0)
+					da.Position= UDim2.new(0,0,0,0)
+					local ne = Instance.new("UIPadding",da)
+					ne.PaddingLeft= UDim.new(0,15)
+					da.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
+					
+					da.MouseEnter:Connect(function()
+						if selected == false then
+						da.BackgroundTransparency= 0
+						da.BackgroundColor3 = Color3.fromRGB(34,34,34)
+						end
+					end)
+					da.MouseLeave:Connect(function()
+						if selected == false then
+						da.BackgroundTransparency = 0
+						da.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
+						end
+					end)
+					da.MouseButton1Down:Connect(function()
+						selectedConfig = args["Name"]
+						selected = true
+						da.BackgroundTransparency = 0
+						Content.Callback(da) 
+					end)
+
+				end
+				function Content:CreateConfig(configName,settings)
+					local args= {
+						Name = (configName or "New Config"),
+						Text = (configName or "New Config"),
+						ESP = {
+							box_esp= settings.ESP.box_esp,
+							healthbar = settings.ESP.healthbar,
+							flagsenabled = settings.ESP.flagsenabled,
+							playername = settings.ESP.playername,
+							displayname = settings.ESP.displayname,
+
+							hp1 = settings.ESP.hp1,
+							hp2 = settings.ESP.hp2,
+							bounddd = settings.ESP.bounddd,
+							healthbarfill= settings.ESP.healthbarfill,
+							simplecolor = settings.ESP.simplecolor,
+							flags = settings.ESP.flags,
+						},
+						World= {
+							ambient_color= settings.World.ambient_color,
+							
+						}
+					}
+					
+					createConfigtext(args)
 				end
 				
 				function Content:SetVisibility()
 					Content_Holder.Visible = not Content_Holder.Visible
 				end
-				utility:CreateConnection(Content_Holder_Button.MouseButton1Click, function()
-					Content.Callback()
-				end)
-				--
-				utility:CreateConnection(Content_Holder_Button.MouseEnter, function()
-					Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(46, 46, 46)
-				end)
-				--
-				utility:CreateConnection(Content_Holder_Button.MouseLeave, function()
-					Holder_Outline_Frame.BackgroundColor3 = Color3.fromRGB(36, 36, 36)
-				end)
+				
 			end
 		end
 		--
