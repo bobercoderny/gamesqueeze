@@ -462,6 +462,7 @@ function library:CreateWindow(Properties)
 			Shadow.Visible = Window.Shadow
 			blur.Enabled = Window.Blur
 			CanvasGGGroup.Visible = Window.Background
+			Section_Holder_Title.FontFace =GetFontFromIndex(library.Font)
 		end)
 		
 		task.spawn(function()
