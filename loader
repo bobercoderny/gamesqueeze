@@ -90,7 +90,7 @@ local library = {
 	TextSize = 11,
 	Accent = Color3.fromRGB(0,255,255),
 	Enabled = true,
-	Font= 2
+	Font= 3
 }
 
 local tws = game:GetService("TweenService")
