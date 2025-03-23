@@ -62,8 +62,9 @@ if not game["Run Service"]:IsStudio() then
 		end
 	end
 end
+local DrawingFontsEnum
 if not game["Run Service"]:IsStudio() then
-	local DrawingFontsEnum = {
+	DrawingFontsEnum = {
 		[0] = Font.new(getcustomasset("Verdana.json"), Enum.FontWeight.Regular),
 		[1] = Font.new(getcustomasset("SmallestPixel7.json"), Enum.FontWeight.Regular),
 		[2] = Font.new(getcustomasset("Proggy.json"), Enum.FontWeight.Regular),
