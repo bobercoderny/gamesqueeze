@@ -1648,6 +1648,14 @@ do -- // Content
 			--
 			do -- // Functions
 
+				function Content:SetVisibilityFalse()
+					Content_Holder.Visible = false
+				end
+
+				function Content:SetVisibilityTrue()
+					Content_Holder.Visible = true
+				end
+
 				function Content:SetVisibility()
 					Content_Holder.Visible = not Content_Holder.Visible
 				end
